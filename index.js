@@ -4,9 +4,14 @@ var io = require('socket.io'),
 
 exports.attach = function (server, shell) {
     var oldListeners = server.listeners('request');
-    server.removeAllListeners('request');
+    server.removeAllListeners('request').splice(0);
     server.on('request', function (req, res) {
-        if (req.url === '/shotgun/shotgun.client.js') {
+        if (req.url !== '/shotgun/shotgun.client.js') {
+            for (var i = 0, l = oldListeners.length; i < l; i++) {
+                oldListeners[i].call(server, req, res);
+            }
+        }
+        else {
             try {
                 fs.readFile(path.join(__dirname, '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'), function (err, socketIoClient) {
                     fs.readFile(path.join(__dirname, '/client/shotgun.client.js'), function (err, shotgunClient) {
@@ -16,11 +21,8 @@ exports.attach = function (server, shell) {
                         });
                     });
                 });
-            } catch (e) {}
-        }
-        else {
-            for (var i = 0, l = oldListeners.length; i < l; i++) {
-                oldListeners[i].call(server, req, res);
+            }
+            catch (e) {
             }
         }
     });
