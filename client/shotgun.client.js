@@ -5,6 +5,7 @@ window.shotgun = {
             context = {},
             resultCallback;
         socket.on('result', function (result) {
+            context = result.context;
             if (resultCallback) resultCallback(result);
         });
         self.execute = function (cmdStr, callback) {
