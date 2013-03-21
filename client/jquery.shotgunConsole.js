@@ -22,7 +22,6 @@
             if (e.which == 13) {
                 client.execute($cli.val(), function (result) {
                     if (result.clearDisplay) $display.html('');
-                    console.log(result);
                     if (result.exit) {
                         window.open('','_self','');
                         window.close();
