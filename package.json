@@ -1,6 +1,6 @@
 {
   "name": "shotgun-client",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A client component for node-shotgun that enables realtime communication with shotgun on the web server.",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,6 @@
     "socket.io": "~0.9.13"
   },
   "peerDependencies": {
-      "shotgun": "1.x"
+    "shotgun": "1.x"
   }
 }
