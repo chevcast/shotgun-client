@@ -3,8 +3,8 @@ var io = require('socket.io'),
     path = require('path');
 
 exports.attach = function (server, shell) {
-    var oldListeners = server.listeners('request');
-    server.removeAllListeners('request').splice(0);
+    var oldListeners = server.listeners('request').splice(0);
+    server.removeAllListeners('request');
     server.on('request', function (req, res) {
         if (req.url !== '/shotgun/shotgun.client.js') {
             for (var i = 0, l = oldListeners.length; i < l; i++) {
