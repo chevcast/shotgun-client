@@ -14,19 +14,24 @@ Using the client couldn't be easier. All it takes is some minor configuration on
 
     // /app.js
     
+    // Create a simple http server.
     var static = require('node-static'),
         http = require('http'),
-        file = new(static.Server)('./public'),
-        shotgun = require('shotgun'),
-        shotgunClient = require('shotgun-client'),
-        shell = new shotgun.Shell();
+        file = new(static.Server)('./public');
     
+    // Start the server and do things as you normally would.
     var server = http.createServer(function (req, res) {
         req.addListener('end', function () {
             file.serve(req, res);
         });
     }).listen(1337, '127.0.0.1');
     
+    // Require shotgun and shotgun-client then create a new shell.
+    var shotgun = require('shotgun'),
+        shotgunClient = require('shotgun-client'),
+        shell = new shotgun.Shell();
+    
+    // Use shotgun-client to wire up the server and the shell.
     shotgunClient.attach(server, shell);
     
     console.log('Server running at http://127.0.0.1:1337/');
