@@ -10,7 +10,7 @@ shotgun-client is a plugin for [node-shotgun](https://github.com/Chevex/node-sho
 
 Using the client couldn't be easier. All it takes is some minor configuration on the server and a script reference on the client.
 
-**Server:**
+**Simple Http Server:**
 
     // /app.js
     
@@ -30,6 +30,8 @@ Using the client couldn't be easier. All it takes is some minor configuration on
     shotgunClient.attach(server, shell);
     
     console.log('Server running at http://127.0.0.1:1337/');
+    
+If you'd like to see an example of shotgun-client running in an [Express](http://expressjs.com/) app then check out [my example application](https://github.com/Chevex/shotgun-client-example).
     
 **Client w/jQuery:**
 
