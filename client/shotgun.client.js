@@ -1,5 +1,5 @@
 window.shotgun = {
-    Shell: function () {
+    Client: function () {
         var self = this,
             socket = io.connect('/shotgun'),
             context = {},
