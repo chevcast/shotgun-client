@@ -12,6 +12,7 @@
                 .css({
                     backgroundColor: 'transparent',
                     color: $this.css('color'),
+                    fontSize: $this.css('font-size'),
                     width: '75%',
                     border: 'none',
                     outline: 'none'
