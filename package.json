@@ -20,6 +20,6 @@
     "socket.io": "~0.9.13"
   },
   "peerDependencies": {
-    "shotgun": "1.x"
+    "shotgun": "*"
   }
 }
