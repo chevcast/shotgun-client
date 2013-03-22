@@ -15,7 +15,8 @@
                     fontSize: $this.css('font-size'),
                     width: '75%',
                     border: 'none',
-                    outline: 'none'
+                    outline: 'none',
+                    marginTop: '5px'
                 })
                 .appendTo($cliContainer);
 
