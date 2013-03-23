@@ -35,6 +35,7 @@
                                 $console.empty();
                             });
                         }
+                        $cli.attr('type', result.password ? 'password' : 'text');
                         for (var count = 0; count < result.lines.length; count++) {
                             var line = result.lines[count];
                             $display.append(line.text.replace(/  /g, ' &nbsp;') + '<br />');
