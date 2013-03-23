@@ -48,8 +48,18 @@
                                 $cliText.html(cliText);
                         }
                         for (var count = 0; count < result.lines.length; count++) {
-                            var line = result.lines[count];
-                            $display.append(line.text.replace(/  /g, ' &nbsp;') + '<br />');
+                            var line = result.lines[count],
+                                $line = $('<div>')
+                                text = line.text.replace(/  /g, ' &nbsp;') + '<br />';
+                            switch (line.type) {
+                                case 'warn':
+                                    text = 'warning: ' + text;
+                                    break;
+                                case 'error':
+                                    text = 'error: ' + text;
+                                    break;
+                            }
+                            $line.html(text).appendTo($display);
                             $console.scrollTop($console[0].scrollHeight);
                         };
                     }
