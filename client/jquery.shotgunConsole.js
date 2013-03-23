@@ -2,11 +2,14 @@
 
     $.fn.shotgunConsole = function (handleResult) {
         var $console = this,
-            client = new shotgun.Client();
+            client = new shotgun.Client(),
+            cliText = '&gt;&nbsp;';
 
         var $display = $('<div>').appendTo($console);
 
-        var $cliContainer = $('<div>').html('&gt;&nbsp;').appendTo($console);
+        var $cliContainer = $('<div>').appendTo($console);
+
+        var $cliText = $('<span>').html(cliText).appendTo($cliContainer);
 
         var $cli = $('<input>')
             .attr('type', 'text')
@@ -36,6 +39,14 @@
                             });
                         }
                         $cli.attr('type', result.password ? 'password' : 'text');
+                        if (result.context) {
+                            if (result.context.prompt)
+                                $cliText.html(result.context.prompt.var + ':&nbsp;');
+                            else if (result.context.passive)
+                                $cliText.html(result.context.passive.msg + cliText);
+                            else
+                                $cliText.html(cliText);
+                        }
                         for (var count = 0; count < result.lines.length; count++) {
                             var line = result.lines[count];
                             $display.append(line.text.replace(/  /g, ' &nbsp;') + '<br />');
