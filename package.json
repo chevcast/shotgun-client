@@ -6,7 +6,10 @@
   "scripts": {
     "test": "mocha -R tap"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chevex/shotgun-client.git"
+  },
   "keywords": [
     "shotgun",
     "node-shotgun",
@@ -15,11 +18,14 @@
     "shotgun-client"
   ],
   "author": "Alex Ford",
-  "license": "Apache",
+  "license": "MIT",
   "dependencies": {
     "socket.io": "~0.9.13"
   },
   "peerDependencies": {
     "shotgun": "*"
-  }
+  },
+  "readmeFilename": "README.md",
+  "gitHead": "e16ca595b22f9e50be00054709176c447b47624a",
+  "devDependencies": {}
 }
