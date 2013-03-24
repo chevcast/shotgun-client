@@ -62,7 +62,7 @@ If you'd like to see an example of shotgun-client running in an [Express](http:/
         </body>
     </html>
 
-The included jQuery adapter is designed to get you up and running quickly. Just call `.shotgunConsole()` on any element and it will be instantly transformed into a simple console that communicates directly, in realtime with your shotgun shell on the server. This is more for the user who wants some sort of admin interface for their website. If you need more control you can override the `handleResult()` function and do work with the shotgun shell result manually.
+The included jQuery adapter is designed to get you up and running quickly. Just call `.shotgunConsole()` on any element and it will be instantly transformed into a simple console that communicates directly, in realtime with your shotgun shell on the server. This is more for the user who wants some sort of admin interface for their website. If you need to perform additional tasks on the shotgun shell result then simply pass in a callback function.
 
     $('body').shotgunConsole(function (result, $display, $console) {
 
@@ -70,20 +70,14 @@ The included jQuery adapter is designed to get you up and running quickly. Just 
         // $display - the element to write text to.
         // $console - the element you called .shotgunConsole() on. In this example it is 'body'.
 
-        if (result.clearDisplay) $display.html('');
         if (result.exit) {
             $console.slideUp('fast', function () {
                 $console.empty();
             });
         }
-        for (var count = 0; count < result.lines.length; count++) {
-            var line = result.lines[count];
-            $display.append(line.text.replace(/  /g, ' &nbsp;') + '<br />');
-            $this.scrollTop($this[0].scrollHeight);
-        };
     });
 
-The code in the example callback function is the same code that is executed if you provide no callback.
+In this example we checked `result.exit` and used jQuery to make the console element disappear.
 
 If you need something even more customized or simply don't want to use jQuery then it's still really simple. Just create and use the client shell directly.
 
