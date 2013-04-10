@@ -70,6 +70,7 @@
                                     delayAfterType: 0,
                                     onComplete: typeLine
                                 };
+                                $.extend(typeOptions, line.typeOptions);
                                 $line.coolType(text, typeOptions);
                             }
                             else {
