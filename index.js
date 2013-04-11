@@ -15,9 +15,11 @@ exports.attach = function (server, shell) {
             try {
                 fs.readFile(path.join(__dirname, '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'), function (err, socketIoClient) {
                     fs.readFile(path.join(__dirname, '/client/shotgun.client.js'), function (err, shotgunClient) {
-                        fs.readFile(path.join(__dirname, '/client/jquery.shotgunConsole.js'), function (err, jqueryShotgunConsole) {
-                            res.writeHead(200, { 'Content-Type': 'application/javascript' });
-                            res.end(socketIoClient + '\n\n' + shotgunClient + '\n\n' + jqueryShotgunConsole);
+                        fs.readFile(path.join(__dirname, '/client/jquery.cooltype.js'), function (err, jqueryCoolType) {
+                            fs.readFile(path.join(__dirname, '/client/jquery.shotgunConsole.js'), function (err, jqueryShotgunConsole) {
+                                res.writeHead(200, { 'Content-Type': 'application/javascript' });
+                                res.end(socketIoClient + '\n\n' + shotgunClient + '\n\n' + jqueryCoolType + '\n\n' + jqueryShotgunConsole);
+                            });
                         });
                     });
                 });

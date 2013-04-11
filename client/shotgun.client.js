@@ -2,15 +2,25 @@ window.shotgun = {
     Client: function () {
         var self = this,
             socket = io.connect('/shotgun'),
-            context = {},
+            storedContext = {},
             resultCallback;
         socket.on('result', function (result) {
-            context = result.context;
+            storedContext = result.context;
             if (resultCallback) resultCallback(result);
         });
-        self.execute = function (cmdStr, callback) {
-            resultCallback = callback;
-            socket.emit('execute', cmdStr, context);
+        self.execute = function (cmdStr) {
+            var context = {};
+            switch (arguments.length) {
+                case 2:
+                    resultCallback = arguments[1];
+                    context = storedContext;
+                    break;
+                case 3:
+                    context = arguments[1];
+                    resultCallback = arguments[2];
+                    break;
+            }
+            socket.emit('execute', cmdStr, storedContext);
         };
     }
 };
