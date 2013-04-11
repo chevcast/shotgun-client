@@ -26,8 +26,21 @@
                 .css({
                     paddingLeft: 3
                 })
-                .html(settings.cursorChar)
-                .hide();
+                .html('&nbsp;');
+
+        $cursor.show = function () {
+            $cursor.html(settings.cursorChar);
+            $cursor.data('showing', true);
+        };
+        $cursor.hide = function () {
+            $cursor.html('&nbsp;');
+            $cursor.data('showing', false);
+        };
+        $cursor.toggle = function () {
+            var showing = $cursor.data('showing');
+            if (showing) $cursor.hide();
+            else $cursor.show();
+        };
 
         $container.appendTo($this);
         $cursor.appendTo($this);
