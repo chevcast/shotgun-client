@@ -29,14 +29,14 @@
         function handleResult(result) {
             if (result.clearDisplay) $display.html('');
             $cli.attr('type', result.password ? 'password' : 'text');
+
             if (result.context) {
-                if (result.context.prompt)
-                    $cliText.html(result.context.prompt.var + ':&nbsp;');
-                else if (result.context.passive)
+                if (result.context.passive)
                     $cliText.html(result.context.passive.msg + cliText);
                 else
                     $cliText.html(cliText);
             }
+
             if (callback)
                 callback(result, $display, $console);
 
@@ -61,14 +61,16 @@
                     }
 
                     $line.appendTo($display);
-                    if ('coolType' in $.fn && text.length > 0 && !line.dontType) {
+                    var dontType = !line.options || !line.options.dontType;
+                    if ('coolType' in $.fn && text.length > 0 && dontType) {
                         typeOptions = {
                             typeSpeed: 0,
                             delayBeforeType: 0,
                             delayAfterType: 0,
                             onComplete: typeLine
                         };
-                        $.extend(typeOptions, line.typeOptions);
+                        if (line.options && line.options.typeOptions)
+                            $.extend(typeOptions, line.options.typeOptions);
                         $line.coolType(text, typeOptions);
                     }
                     else {
@@ -78,20 +80,35 @@
 
                     $console.scrollTop($console[0].scrollHeight);
                 }
+                else {
+                    $console.data('busy', false);
+                    if (result.context) {
+                        if (result.context.prompt)
+                            $cliText.html(result.context.prompt.var + ':&nbsp;');
+                    }
+                }
             })();
         }
 
         $cli.keypress(function (e) {
-            if (e.which == 13) {
+            var busy = $console.data('busy');
+            if (e.which == 13 && !busy && $cli.val().length > 0) {
+                $console.data('busy', true);
                 client.execute($cli.val(), handleResult);
                 $cli.val('');
             }
         });
 
-        var execute = client.execute;
-        client.execute = function (cmdStr) {
-            execute(cmdStr, handleResult);
+        return {
+            execute: function (cmdStr) {
+                var busy = $console.data('busy');
+                if (!busy) {
+                    $console.data('busy', true);
+                    client.execute(cmdStr, handleResult);
+                }
+            },
+            client: client,
+            handleResult: handleResult
         };
-        return client;
     };
 })(jQuery);
