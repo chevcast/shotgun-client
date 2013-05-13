@@ -12,7 +12,7 @@ Using the client couldn't be easier. All it takes is some minor configuration on
 
 **Simple Http Server:**
 
-    // /app.js
+    // app.js
     
     // Create a simple http server.
     var static = require('node-static'),
