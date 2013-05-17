@@ -107,6 +107,10 @@
                     client.execute(cmdStr, handleResult);
                 }
             },
+            $console: $console,
+            $display: $display,
+            $cli: $cli,
+            $cliText: $cliText,
             client: client,
             handleResult: handleResult
         };
