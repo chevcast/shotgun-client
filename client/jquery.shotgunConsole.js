@@ -80,13 +80,8 @@
 
                     $console.scrollTop($console[0].scrollHeight);
                 }
-                else {
+                else
                     $console.data('busy', false);
-                    if (result.context) {
-                        if (result.context.prompt)
-                            $cliText.html(result.context.prompt.var + ':&nbsp;');
-                    }
-                }
             })();
         }
 
