@@ -30,19 +30,15 @@ exports.attach = function (server) {
     });
     var listener = io.listen(server, { log: false });
     var args = arguments;
-    if (args.length > 1) {
-        for (var index = 1; index < args.length; index++) {
-            var shell = args[index];
-            (function (shell) {
-                listener.of('/' + shell.namespace || 'shotgun')
-                    .on('connection', function (socket) {
-                        socket.on('execute', function (cmdStr, context, options) {
-                            console.log('Received: ' + cmdStr);
-                            var result = shell.execute(cmdStr, context, options);
-                            socket.emit('result', result);
-                        });
+    if (args.length > 1)
+        args.forEach(function (shell) {
+            listener.of('/' + shell.namespace || 'shotgun')
+                .on('connection', function (socket) {
+                    socket.on('execute', function (cmdStr, context, options) {
+                        console.log('Received: ' + cmdStr);
+                        var result = shell.execute(cmdStr, context, options);
+                        socket.emit('result', result);
                     });
-            })(shell);
-        }
-    }
+                });
+        });
 };
