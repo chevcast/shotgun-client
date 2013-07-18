@@ -29,16 +29,15 @@ exports.attach = function (server) {
         }
     });
     var listener = io.listen(server, { log: false });
-    var args = [].splice.call(arguments,0);
-    if (args.length > 1)
-        args.forEach(function (shell) {
-            listener.of('/' + shell.namespace || 'shotgun')
-                .on('connection', function (socket) {
-                    socket.on('execute', function (cmdStr, context, options) {
-                        console.log('Received: ' + cmdStr);
-                        var result = shell.execute(cmdStr, context, options);
-                        socket.emit('result', result);
-                    });
+    var args = [].splice.call(arguments,1);
+    args.forEach(function (shell) {
+        listener.of('/' + shell.namespace || 'shotgun')
+            .on('connection', function (socket) {
+                socket.on('execute', function (cmdStr, context, options) {
+                    console.log('Received: ' + cmdStr);
+                    var result = shell.execute(cmdStr, context, options);
+                    socket.emit('result', result);
                 });
-        });
+            });
+    });
 };
