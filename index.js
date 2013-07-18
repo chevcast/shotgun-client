@@ -29,7 +29,7 @@ exports.attach = function (server) {
         }
     });
     var listener = io.listen(server, { log: false });
-    var args = arguments;
+    var args = [].splice.call(arguments,0);
     if (args.length > 1)
         args.forEach(function (shell) {
             listener.of('/' + shell.namespace || 'shotgun')
