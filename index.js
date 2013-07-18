@@ -2,7 +2,7 @@ var io = require('socket.io'),
     fs = require('fs'),
     path = require('path');
 
-exports.attach = function (server, shell) {
+exports.attach = function (server) {
     var oldListeners = server.listeners('request').splice(0);
     server.removeAllListeners('request');
     server.on('request', function (req, res) {
@@ -28,13 +28,21 @@ exports.attach = function (server, shell) {
             }
         }
     });
-    io.listen(server, { log: false })
-        .of('/shotgun')
-        .on('connection', function (socket) {
-            socket.on('execute', function (cmdStr, context, options) {
-                console.log('Received: ' + cmdStr)
-                var result = shell.execute(cmdStr, context, options);
-                socket.emit('result', result);
-            });
-        });
+    var listener = io.listen(server, { log: false });
+    var args = arguments;
+    if (args.length > 1) {
+        for (var index = 1; index < args.length; index++) {
+            var shell = args[index];
+            (function (shell) {
+                listener.of('/' + shell.namespace || 'shotgun')
+                    .on('connection', function (socket) {
+                        socket.on('execute', function (cmdStr, context, options) {
+                            console.log('Received: ' + cmdStr);
+                            var result = shell.execute(cmdStr, context, options);
+                            socket.emit('result', result);
+                        });
+                    });
+            })(shell);
+        }
+    }
 };

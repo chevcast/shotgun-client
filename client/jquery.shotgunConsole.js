@@ -1,8 +1,8 @@
 (function ($) {
 
-    $.fn.shotgunConsole = function (callback) {
+    $.fn.shotgunConsole = function (namespace, callback) {
         var $console = this,
-            client = new shotgun.Client(),
+            client = new shotgun.Client(namespace),
             cliText = '&gt;&nbsp;';
 
         var $display = $('<div>').appendTo($console);
