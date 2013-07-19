@@ -65,9 +65,25 @@ If you'd like to see an example of shotgun-client running in an [Express](http:/
         </body>
     </html>
 
-The included jQuery adapter is designed to get you up and running quickly. Just call `.shotgunConsole()` on any element and it will be instantly transformed into a simple console that communicates directly, in realtime with your shotgun shell on the server. This is more for the user who wants some sort of admin interface for their website. If you need to perform additional tasks on the shotgun shell result then simply pass in a callback function.
+The included jQuery adapter is designed to get you up and running quickly. Just call `.shotgunConsole()` on any element and it will be instantly transformed into a simple console that communicates directly, in realtime with your shotgun shell on the server. This is more for the user who wants some sort of admin interface for their website. If you want to create more than one console and have it tied to different shotgun shell instances then pass in a namespace.
 
-    $('body').shotgunConsole(function (result, $display, $console) {
+    // server
+    var shotgun = require('shotgun'),
+        shotgunClient = require('shotgun-client'),
+        shell1 = new shotgun.Shell('shell1'),
+        shell2 = new shotgun.Shell('shell2');
+
+    shotgunClient.attach(server, shell1, shell2);
+
+    // client
+    $(function () {
+        $('div#shell1').shotgunConsole('shell1');
+        $('div#shell2').shotgunConsole('shell2');
+    });
+
+If a namespace is not specified then it defaults to "cmds". If you need to perform additional tasks on the shotgun shell result then simply pass in a callback function.
+
+    $('body').shotgunConsole('cmds', function (result, $display, $console) {
 
         //   result - the object returned by the shotgun shell.
         // $display - the element to write text to.
@@ -109,6 +125,10 @@ If you need something even more customized or simply don't want to use jQuery th
         <body>
         </body>
     </html>
+
+You can also specify a namespace if you're consuming the client without JQuery.
+
+    var client = new shotgun.Client('shell1');
 
 Note that you have access to `result.context` but you don't have to worry about passing it back into `client.execute`; the shotgun client script will do this for you. However, if for some reason you do need to manipulate the context then you can pass it back like this:
 
