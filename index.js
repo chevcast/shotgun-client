@@ -31,7 +31,7 @@ exports.attach = function (server) {
     var listener = io.listen(server, { log: false });
     var args = [].splice.call(arguments,1);
     args.forEach(function (shell) {
-        listener.of('/' + shell.namespace || 'shotgun')
+        listener.of('/' + shell.namespace)
             .on('connection', function (socket) {
                 socket.on('execute', function (cmdStr, context, options) {
                     console.log('%s: %s', shell.namespace, cmdStr);
