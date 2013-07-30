@@ -1,7 +1,7 @@
 window.shotgun = {
     Client: function (namespace) {
         var self = this,
-            socket = io.connect('/' + namespace || 'cmds'),
+            socket = io.connect('/' + (namespace || 'cmds')),
             storedContext = {},
             resultCallback;
         socket.on('result', function (result) {
