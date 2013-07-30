@@ -63,7 +63,7 @@
                     $line.appendTo($display);
                     var dontType = !line.options || !line.options.dontType;
                     if ('coolType' in $.fn && text.length > 0 && dontType) {
-                        typeOptions = {
+                        var typeOptions = {
                             typeSpeed: 0,
                             delayBeforeType: 0,
                             delayAfterType: 0,
