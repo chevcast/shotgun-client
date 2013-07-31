@@ -28,13 +28,15 @@ exports.attach = function (server) {
             }
         }
     });
-    var listener = io.listen(server, { log: false });
+    var sio = io.listen(server, { log: false });
     var args = [].splice.call(arguments,1);
     args.forEach(function (shell) {
-        listener.of('/' + shell.namespace)
+        sio.of('/' + shell.namespace)
             .on('connection', function (socket) {
                 socket.on('execute', function (cmdStr, context, options) {
                     console.log('%s: %s', shell.namespace, cmdStr);
+                    if (!options) options = {};
+                    options.socket = socket;
                     var result = shell.execute(cmdStr, context, options);
                     socket.emit('result', result);
                 });
