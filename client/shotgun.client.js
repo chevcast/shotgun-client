@@ -4,7 +4,7 @@ window.shotgun = {
             storedContext = {},
             resultCallback;
         self.socket = io.connect('/' + (namespace || 'cmds'));
-        socket.on('result', function (result) {
+        self.socket.on('result', function (result) {
             storedContext = result.context;
             if (resultCallback) resultCallback(result);
         });
@@ -20,7 +20,7 @@ window.shotgun = {
                     resultCallback = arguments[2];
                     break;
             }
-            socket.emit('execute', cmdStr, storedContext);
+            self.socket.emit('execute', cmdStr, storedContext);
         };
     }
 };
