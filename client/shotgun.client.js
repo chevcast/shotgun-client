@@ -2,9 +2,9 @@ window.shotgun = {
     Client: function (namespace) {
         var self = this,
             storedContext = {},
-            resultCallback,
-            socket = io.connect('/' + (namespace || 'cmds'));
-        socket.on('result', function (result) {
+            resultCallback;
+        self.socket = io.connect('/' + (namespace || 'shotgun'));
+        self.socket.on('result', function (result) {
             storedContext = result.context;
             if (resultCallback) resultCallback(result);
         });
@@ -20,7 +20,7 @@ window.shotgun = {
                     resultCallback = arguments[2];
                     break;
             }
-            socket.emit('execute', cmdStr, storedContext);
+            self.socket.emit('execute', cmdStr, storedContext);
         };
     }
 };
