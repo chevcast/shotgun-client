@@ -31,7 +31,7 @@ window.shotgun = {
                     resultCallback = arguments[2];
                     break;
             }
-            if (!context.cookies) context.cookies = {};
+            context.cookies = {};
             if (document.cookie.length > 0)
                 document.cookie.split(';').forEach(function (cookie) {
                     var components = cookie.split('=');
