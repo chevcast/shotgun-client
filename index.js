@@ -33,6 +33,14 @@ exports.attach = function (server) {
     var sio = io.listen(server, { log: false });
     var args = [].splice.call(arguments,1);
     args.forEach(function (shell) {
+        shell.helpers.setCookie = function (name, value, days) {
+            if (!this.cookies) this.cookies = [];
+            this.cookies.push({
+                name: name,
+                value: value,
+                days: days
+            });
+        };
         sio.of('/' + shell.namespace)
             .on('connection', function (socket) {
                 socket.on('execute', function (cmdStr, context, options) {
