@@ -50,4 +50,7 @@ exports.attach = function (server) {
                 });
             });
     });
+    return {
+        socketIo: sio
+    };
 };
