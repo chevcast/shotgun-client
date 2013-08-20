@@ -54,18 +54,17 @@
                     switch (line.type) {
                         case 'warn':
                             text = 'Warning: ' + text;
-                            $line.css('color', '#ffa500');
                             break;
                         case 'error':
                             text = 'Error: ' + text;
-                            $line.css('color', '#ff0000');
                             break;
                         case 'debug':
                             text = 'Debug: ' + text;
-                            $line.css('color', '#0000ff');
                     }
 
+                    $line.addClas(line.type);
                     $line.appendTo($display);
+                    
                     var dontType = !line.options || !line.options.dontType;
                     if ('coolType' in $.fn && text.length > 0 && dontType) {
                         var typeOptions = {
