@@ -62,9 +62,9 @@
                             text = 'Debug: ' + text;
                     }
 
-                    $line.addClas(line.type);
+                    $line.addClass(line.type);
                     $line.appendTo($display);
-                    
+
                     var dontType = !line.options || !line.options.dontType;
                     if ('coolType' in $.fn && text.length > 0 && dontType) {
                         var typeOptions = {
