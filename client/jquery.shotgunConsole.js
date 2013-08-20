@@ -53,13 +53,13 @@
 
                     switch (line.type) {
                         case 'warn':
-                            text = 'Warning: ' + text;
+                            text = 'WARNING: ' + text;
                             break;
                         case 'error':
-                            text = 'Error: ' + text;
+                            text = 'ERROR: ' + text;
                             break;
                         case 'debug':
-                            text = 'Debug: ' + text;
+                            text = 'DEBUG: ' + text;
                     }
 
                     $line.addClass(line.type);
