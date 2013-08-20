@@ -54,15 +54,15 @@
                     switch (line.type) {
                         case 'warn':
                             text = 'Warning: ' + text;
-                            $line.css('color', '#ff0');
+                            $line.css('color', '#ffa500');
                             break;
                         case 'error':
                             text = 'Error: ' + text;
-                            $line.css('color', '#f00');
+                            $line.css('color', '#ff0000');
                             break;
                         case 'debug':
                             text = 'Debug: ' + text;
-                            $line.css('color', '#00f');
+                            $line.css('color', '#0000ff');
                     }
 
                     $line.appendTo($display);
