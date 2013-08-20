@@ -58,7 +58,7 @@
                             break;
                         case 'error':
                             text = 'Error: ' + text;
-                            $line.css('color', '#0f0');
+                            $line.css('color', '#f00');
                             break;
                         case 'debug':
                             text = 'Debug: ' + text;
