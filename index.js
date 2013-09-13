@@ -45,8 +45,9 @@ exports.attach = function (server) {
             .on('connection', function (socket) {
                 socket.on('execute', function (cmdStr, context, options) {
                     if (exports.debug) console.log('%s: %s', shell.namespace, cmdStr);
-                    var result = shell.execute(cmdStr, context, options);
-                    socket.emit('result', result);
+                    shell.execute(cmdStr, context, options, function (result) {
+                        socket.emit('result', result);
+                    });
                 });
             });
     });
