@@ -1,34 +1,34 @@
 window.shotgun = {
     Client: function (namespace) {
-        var self = this,
+        var clientShell = this,
             storedContext = {},
-            resultCallback;
-        self.socket = io.connect('/' + (namespace || 'shotgun'));
-        self.setCookie = function(name, value, days)
+            dataCallback;
+        clientShell.socket = io.connect('/' + (namespace || 'shotgun'));
+        clientShell.setCookie = function(name, value, days)
         {
             var expiration = new Date();
             expiration.setDate(expiration.getDate() + days);
             var value = encodeURIComponent(value) + ((days == null) ? "" : "; expires=" + expiration.toUTCString());
             document.cookie = name + "=" + value;
         };
-        self.socket.on('result', function (result) {
-            storedContext = result.context;
-            if (result.cookies)
-                result.cookies.forEach(function (cookie) {
-                    self.setCookie(cookie.name, cookie.value, cookie.days);
+        clientShell.socket.on('data', function (data, context) {
+            storedContext = context;
+            if (context.cookies)
+                context.cookies.forEach(function (cookie) {
+                    clientShell.setCookie(cookie.name, cookie.value, cookie.days);
                 });
-            if (resultCallback) resultCallback(result);
+            if (dataCallback) dataCallback(result);
         });
-        self.execute = function (cmdStr) {
+        clientShell.execute = function (cmdStr) {
             var context = {};
             switch (arguments.length) {
                 case 2:
-                    resultCallback = arguments[1];
+                    dataCallback = arguments[1];
                     context = storedContext;
                     break;
                 case 3:
                     context = arguments[1];
-                    resultCallback = arguments[2];
+                    dataCallback = arguments[2];
                     break;
             }
             context.cookies = {};
@@ -37,7 +37,9 @@ window.shotgun = {
                     var components = cookie.split('=');
                     context.cookies[components[0]] = components[1];
                 });
-            self.socket.emit('execute', cmdStr, context);
+            clientShell.socket.emit('execute', cmdStr, context);
+            return clientShell;
         };
+        return clientShell;
     }
 };
