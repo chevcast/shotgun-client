@@ -49,7 +49,7 @@ exports.attach = function (server) {
                     if (exports.debug) console.log('%s: %s', shell.namespace, cmdStr);
                     shell
                         .setContext(context)
-                        .onContext(function (context) {
+                        .onContextChanged(function (context) {
                             socket.emit('data', {}, context);
                         })
                         .onData(function (data) {
