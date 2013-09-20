@@ -48,7 +48,7 @@ exports.attach = function (server) {
                 socket.on('execute', function (cmdStr, options, context) {
                     if (exports.debug) console.log('%s: %s', shell.namespace, cmdStr);
                     shell
-                        .setContext(context)
+                        .setContextStorage(context)
                         .onContextChanged(function (context) {
                             socket.emit('data', {}, context);
                         })
