@@ -5,4 +5,6 @@
 
 > shotgun-client is a plugin for [node-shotgun](https://github.com/Chevex/node-shotgun) that allows creation of real-time web consoles that communicate with the shotgun shell on the server.
 
+![](http://i.imgur.com/PvLNexQ.gif)
+
 To learn more head over to the [shotgun-client wiki](https://github.com/Chevex/shotgun-client/wiki).

@@ -3,28 +3,31 @@
     $.fn.shotgunConsole = function (options, callback) {
         var $console = this,
             clientShell = new shotgun.ClientShell(options),
-            cliText = '&gt;&nbsp;';
-
-        var $display = $('<div>').appendTo($console);
-
-        var $cliContainer = $('<div>').appendTo($console);
-
-        var $cliText = $('<span>').html(cliText).appendTo($cliContainer);
-
-        var $cli = $('<input>')
-            .attr('type', 'text')
-            .attr('autofocus', 'autofocus')
-            .css({
-                backgroundColor: 'transparent',
-                color: $console.css('color'),
-                fontSize: $console.css('font-size'),
-                width: '75%',
-                border: 'none',
-                outline: 'none',
-                marginTop: '20px'
-            })
-            .appendTo($cliContainer)
-            .focus();
+            cliText = '&gt;&nbsp;',
+            $display = $('<div>').appendTo($console),
+            $cliContainer = $('<div>').appendTo($console),
+            $cliText = $('<span>').html(cliText).appendTo($cliContainer),
+            $cli = $('<input>')
+                .attr('type', 'text')
+                .attr('autofocus', 'autofocus')
+                .css({
+                    backgroundColor: 'transparent',
+                    color: $console.css('color'),
+                    fontSize: $console.css('font-size'),
+                    width: '75%',
+                    border: 'none',
+                    outline: 'none',
+                    marginTop: '20px'
+                })
+                .appendTo($cliContainer)
+                .focus(),
+            ui = {
+                $console: $console,
+                $display: $display,
+                $cli: $cli,
+                $cliText: $cliText,
+                $cliContainer: $cliContainer
+            };
 
         function onData(data, context) {
             if (data.clearDisplay) $display.html('');
@@ -79,7 +82,7 @@
 
         clientShell.onData(function (data, context) {
             onData(data, context);
-            if (callback) callback(data, context);
+            if (callback) callback(data, context, ui);
         });
 
         $cli.keypress(function (e) {
@@ -99,12 +102,8 @@
                     clientShell.execute(cmdStr);
                 }
             },
-            $console: $console,
-            $display: $display,
-            $cli: $cli,
-            $cliText: $cliText,
-            $cliContainer: $cliContainer,
-            clientShell: clientShell
+            clientShell: clientShell,
+            ui: ui
         };
     };
 })(jQuery);
