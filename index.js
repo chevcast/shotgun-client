@@ -35,12 +35,8 @@ exports.attach = function (server) {
     args.forEach(function (shell) {
         shell.setCookie = function (name, value, days) {
             return shell.modifyContext(function (context) {
-                if (!context.cookies) context.cookies = [];
-                context.cookies.push({
-                    name: name,
-                    value: value,
-                    days: days
-                });
+                if (!context.newCookies) context.newCookies = {};
+                context.newCookies[name] = { value: value, days: days };
             });
         };
         sio.of('/' + shell.namespace)
