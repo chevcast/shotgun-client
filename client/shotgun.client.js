@@ -105,11 +105,11 @@
 
             clientShell.socket.on('data', function (data, context) {
                 clientShell.context = context;
-                if (context.cookies)
-                    for (var name in context.cookies) {
-                        if (context.cookies.hasOwnProperty(name)) {
-                            var cookie = context.cookies[name];
-                            clientShell.setCookie(cookie.name, cookie.value, cookie.days);
+                if (context.newCookies)
+                    for (var name in context.newCookies) {
+                        if (context.newCookies.hasOwnProperty(name)) {
+                            var cookie = context.newCookies[name];
+                            clientShell.setCookie(name, cookie.value, cookie.days);
                         }
                     }
                 if (dataCallback) dataCallback(data);
