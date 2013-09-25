@@ -27,7 +27,8 @@
                 $cli: $cli,
                 $cliText: $cliText,
                 $cliContainer: $cliContainer
-            };
+            },
+            lineQueue = [];
 
         function onData(data, context) {
             if (data.clearDisplay) $display.html('');
@@ -39,45 +40,57 @@
                 $cliText.html(cliText);
 
             if (data.line) {
-                var $line = $('<div>'),
-                    text = data.line.text.replace(/(  +)/g, function (match) {
-                        return new Array(match.length + 1).join('&nbsp;');
-                    }).replace(/(\r\n|\r|\n)/, '');
+                function writeLines() {
+                    var line = lineQueue.shift(),
+                        $line = $('<div>'),
+                        text = line.text.replace(/(  +)/g, function (match) {
+                            return new Array(match.length + 1).join('&nbsp;');
+                        }).replace(/(\r\n|\r|\n)/, '');
 
-                text = text.length > 0 ? text : '&nbsp;';
+                    text = text.length > 0 ? text : '&nbsp;';
 
-                switch (data.line.type) {
-                    case 'warn':
-                        text = 'WARNING: ' + text;
-                        break;
-                    case 'error':
-                        text = 'ERROR: ' + text;
-                        break;
-                    case 'debug':
-                        text = 'DEBUG: ' + text;
+                    switch (line.type) {
+                        case 'warn':
+                            text = 'WARNING: ' + text;
+                            break;
+                        case 'error':
+                            text = 'ERROR: ' + text;
+                            break;
+                        case 'debug':
+                            text = 'DEBUG: ' + text;
+                    }
+
+                    $line.addClass(line.type);
+                    $line.appendTo($display);
+
+                    if ('coolType' in $.fn && !line.options.dontType) {
+                        var coolTypeOptions = {
+                            typeSpeed: 0,
+                            delayBeforeType: 0,
+                            delayAfterType: 0,
+                            onComplete: function () {
+                                console.log(line);
+                                if (lineQueue.length == 0)
+                                    $console.data('busy', false);
+                                else
+                                    writeLines();
+                            }
+                        };
+                        if (line.options.coolTypeOptions)
+                            $.extend(true, coolTypeOptions, line.options.coolTypeOptions);
+                        $line.coolType(text, coolTypeOptions);
+                    }
+                    else
+                        $line.html(text);
+
+                    $console.scrollTop($console[0].scrollHeight);
                 }
-
-                $line.addClass(data.line.type);
-                $line.appendTo($display);
-
-                if ('coolType' in $.fn && !data.line.options.dontType) {
-                    var coolTypeOptions = {
-                        typeSpeed: 0,
-                        delayBeforeType: 0,
-                        delayAfterType: 0,
-                        onComplete: $console.data.bind($console, 'busy', false)
-                    };
-                    if (data.line.options.coolTypeOptions)
-                        $.extend(true, coolTypeOptions, data.line.options.coolTypeOptions);
-                    $line.coolType(text, coolTypeOptions);
+                lineQueue.push(data.line);
+                if (!$console.data('busy')) {
+                    $console.data('busy', true);
+                    writeLines();
                 }
-                else
-                    $line.html(text);
-
-                $console.scrollTop($console[0].scrollHeight);
             }
-            else
-                $console.data('busy', false);
         }
 
         clientShell.onData(function (data, context) {
@@ -86,9 +99,7 @@
         });
 
         $cli.keypress(function (e) {
-            var busy = $console.data('busy');
-            if (e.which == 13 && !busy && $cli.val().length > 0) {
-                $console.data('busy', true);
+            if (e.which == 13 && !$console.data('busy') && $cli.val().length > 0) {
                 clientShell.execute($cli.val());
                 $cli.val('');
             }
@@ -96,9 +107,7 @@
 
         return {
             execute: function (cmdStr, options) {
-                var busy = $console.data('busy');
-                if (!busy) {
-                    $console.data('busy', true);
+                if (!$console.data('busy')) {
                     clientShell.execute(cmdStr);
                 }
             },
