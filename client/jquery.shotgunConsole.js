@@ -32,7 +32,8 @@
 
         function onData(data, context) {
             if (data.clearDisplay) $display.html('');
-            $cli.attr('type', data.password ? 'password' : 'text');
+            if (data.password)
+                $cli.attr('type', 'password');
 
             if (context.passive)
                 $cliText.html(context.passive.msg + cliText);
@@ -104,6 +105,8 @@
         $cli.keypress(function (e) {
             if (e.which == 13 && !$console.data('busy') && $cli.val().length > 0) {
                 clientShell.execute($cli.val());
+                if ($cli.attr('type') === 'password')
+                    $cli.attr('type', 'text');
                 $cli.val('');
             }
         });
