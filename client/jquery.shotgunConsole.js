@@ -63,24 +63,28 @@
                     $line.addClass(line.type);
                     $line.appendTo($display);
 
+                    function onComplete() {
+                        if (lineQueue.length == 0)
+                            $console.data('busy', false);
+                        else
+                            writeLines();
+                    }
+
                     if ('coolType' in $.fn && !line.options.dontType) {
                         var coolTypeOptions = {
                             typeSpeed: 0,
                             delayBeforeType: 0,
                             delayAfterType: 0,
-                            onComplete: function () {
-                                if (lineQueue.length == 0)
-                                    $console.data('busy', false);
-                                else
-                                    writeLines();
-                            }
+                            onComplete: onComplete
                         };
                         if (line.options.coolTypeOptions)
                             $.extend(true, coolTypeOptions, line.options.coolTypeOptions);
                         $line.coolType(text, coolTypeOptions);
                     }
-                    else
+                    else {
                         $line.html(text);
+                        onComplete();
+                    }
 
                     $console.scrollTop($console[0].scrollHeight);
                 }
