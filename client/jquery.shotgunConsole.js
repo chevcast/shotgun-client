@@ -69,7 +69,6 @@
                             delayBeforeType: 0,
                             delayAfterType: 0,
                             onComplete: function () {
-                                console.log(line);
                                 if (lineQueue.length == 0)
                                     $console.data('busy', false);
                                 else
