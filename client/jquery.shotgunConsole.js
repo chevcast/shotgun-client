@@ -35,7 +35,9 @@
             if (data.password)
                 $cli.attr('type', 'password');
 
-            if (context.passive)
+            if (context.prompt)
+                $cliText.html(context.prompt.msg + cliText);
+            else if (context.passive)
                 $cliText.html(context.passive.msg + cliText);
             else
                 $cliText.html(cliText);
