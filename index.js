@@ -2,8 +2,6 @@ var io = require('socket.io'),
     fs = require('fs'),
     path = require('path');
 
-exports.debug = false;
-
 exports.attach = function (server) {
     var oldListeners = server.listeners('request').splice(0);
     server.removeAllListeners('request');
@@ -42,7 +40,7 @@ exports.attach = function (server) {
         sio.of('/' + shell.namespace)
             .on('connection', function (socket) {
                 socket.on('execute', function (cmdStr, options, context) {
-                    if (exports.debug) console.log('%s: %s', shell.namespace, cmdStr);
+                    if (shell.settings.debug) console.log('%s: %s', shell.namespace, cmdStr);
                     shell
                         .setContextStorage(context)
                         .onContextChanged(function (context) {
