@@ -99,7 +99,7 @@
             {
                 var expiration = new Date();
                 expiration.setDate(expiration.getDate() + days);
-                value = encodeURIComponent(value) + ((days == null) ? "" : "; expires=" + expiration.toUTCString());
+                value = encodeURIComponent(value) + ((days == null) ? "" : ";expires=" + expiration.toUTCString());
                 document.cookie = name + "=" + value;
             };
 
@@ -128,7 +128,7 @@
                 if (document.cookie.length > 0)
                     document.cookie.split(';').forEach(function (cookie) {
                         var components = cookie.split('=');
-                        clientShell.context.cookies[components[0]] = components[1];
+                        clientShell.context.cookies[components[0].trim()] = components[1];
                     });
                 clientShell.socket.emit('execute', cmdStr, options, clientShell.context);
                 return clientShell;
