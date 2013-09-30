@@ -126,6 +126,7 @@
                 }
             })
             .keydown(function (e) {
+                if ($cli.attr('type') === 'password') return;
                 switch (e.which) {
                     case keys.upArrow:
                         if (cliHistory.length > 0) {
