@@ -32,10 +32,10 @@ exports.attach = function (server) {
     var args = [].splice.call(arguments,1);
     args.forEach(function (shell) {
         shell.setCookie = function (name, value, days) {
-            return shell.modifyContext(function (context) {
-                if (!context.newCookies) context.newCookies = {};
-                context.newCookies[name] = { value: value, days: days };
-            });
+            if (!this.context.newCookies) this.context.newCookies = {};
+            this.context.newCookies[name] = { value: value, days: days };
+            this.contextChanged();
+            return this;
         };
         sio.of('/' + shell.namespace)
             .on('connection', function (socket) {
