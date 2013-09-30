@@ -128,7 +128,7 @@
                 if (document.cookie.length > 0)
                     document.cookie.split(';').forEach(function (cookie) {
                         var components = cookie.split('=');
-                        clientShell.context.cookies[components[0].trim()] = components[1];
+                        clientShell.context.cookies[components[0].trim()] = decodeURIComponent(components[1]);
                     });
                 clientShell.socket.emit('execute', cmdStr, options, clientShell.context);
                 return clientShell;
