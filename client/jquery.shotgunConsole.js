@@ -28,7 +28,9 @@
                 $cliText: $cliText,
                 $cliContainer: $cliContainer
             },
-            lineQueue = [];
+            lineQueue = [],
+            cliHistory = []
+        cliIndex = -1;
 
         function onData(data, context) {
             if (data.clearDisplay) $display.html('');
@@ -104,14 +106,46 @@
             if (callback) callback(data, context, ui);
         });
 
-        $cli.keypress(function (e) {
-            if (e.which == 13 && !$console.data('busy') && $cli.val().length > 0) {
-                clientShell.execute($cli.val());
-                if ($cli.attr('type') === 'password')
-                    $cli.attr('type', 'text');
-                $cli.val('');
-            }
-        });
+        var keys = {
+            enter: 13,
+            upArrow: 38,
+            downArrow: 40
+        };
+
+        $cli
+            .keypress(function (e) {
+                if (e.which == keys.enter && !$console.data('busy') && $cli.val().length > 0) {
+                    var cliText = $cli.val();
+                    clientShell.execute(cliText);
+                    if ($cli.attr('type') === 'password')
+                        $cli.attr('type', 'text');
+                    else
+                        cliHistory.push(cliText);
+                    $cli.val('');
+                    cliIndex = -1;
+                }
+            })
+            .keydown(function (e) {
+                switch (e.which) {
+                    case keys.upArrow:
+                        if (cliHistory.length > 0) {
+                            if (cliIndex === -1)
+                                cliIndex = cliHistory.length - 1;
+                            else if (cliIndex > 0)
+                                cliIndex--;
+                        }
+                        $cli.val(cliHistory[cliIndex]);
+                        break;
+                    case keys.downArrow:
+                        if (cliIndex < cliHistory.length - 1 && cliIndex > -1)
+                            cliIndex++;
+                        else if (cliIndex === cliHistory.length - 1)
+                            cliIndex = -1;
+                        $cli.val(cliHistory[cliIndex]);
+                        break;
+                }
+            });
+
 
         return {
             execute: function (cmdStr, options) {
