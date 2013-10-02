@@ -44,7 +44,7 @@ exports.attach = function (server) {
     });
 
     // Instantiate socket.io server.
-    var sio = io.listen(server, { log: false });
+    var sockets = io.listen(server, { log: false });
 
     // Create an array of all arguments passed in except the first one.
     // The first argument was the http server and all other arguments are expected to be shotgun hell instances.
@@ -53,24 +53,28 @@ exports.attach = function (server) {
     // Iterate over each shell and associate a socket.io namespace with each shell instance passed in.
     shells.forEach(function (shell) {
 
+        // Add io to the shell for advanced users.
+        shell.socketIo = io;
+
         // Create a shell helper function for setting cookies on the client.
-        // todo: prepend cookie names with the shell and only send back cookies with the correct shell.
         shell.setCookie = function (name, value, days) {
-            if (!this.context.newCookies) this.context.newCookies = {};
-            this.context.newCookies[name] = { value: value, days: days };
-            this.contextChanged();
-            return this;
+            var newCookies = shell.getVar('newCookies') || {};
+            newCookies[shell.settings.namespace + '|' + name] = { value: value, days: days };
+            return shell.setVar('newCookies', newCookies);
         };
 
         // Setup socket.io namespace for the current shell.
-        sio.of('/' + shell.namespace)
+        sockets.of('/' + shell.settings.namespace)
             .on('connection', function (socket) {
 
                 // Listen for our custom "execute" socket.io event.
                 socket.on('execute', function (cmdStr, context, options) {
 
+                    // Add current socket to context for advanced users.
+                    context.socket = socket;
+
                     // If the shell has its debug setting enabled then write out user input to console.
-                    if (shell.settings.debug) console.log('%s: %s', shell.namespace, cmdStr);
+                    if (shell.settings.debug) console.log('%s: %s', shell.settings.namespace, cmdStr);
 
                     // Configure the shell for this execution.
                     shell
@@ -86,11 +90,12 @@ exports.attach = function (server) {
                         // Execute the shell.
                         .execute(cmdStr, context, options);
                 });
+
             });
     });
 
     // Return any relevant internals for shotgun-client.
     return {
-        socketIo: sio
+        sockets: sockets
     };
 };
