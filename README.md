@@ -7,4 +7,6 @@
 
 ![](http://i.imgur.com/PvLNexQ.gif)
 
-To learn more head over to the [shotgun-client wiki](https://github.com/Chevex/shotgun-client/wiki).
+- [Documentation](https://github.com/Chevex/shotgun-client/wiki)
+- [Source](https://github.com/Chevex/shotgun-client)
+- [Issues](https://github.com/Chevex/shotgun-client/issues)
