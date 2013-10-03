@@ -92,18 +92,6 @@
                     // If text is empty then force a non-breaking space for compatibility with JQuery and coolType.
                     text = text.length > 0 ? text : '&nbsp;';
 
-                    // Prepend warning, error, and debug lines with the relevant label.
-                    switch (line.type) {
-                        case 'warn':
-                            text = 'WARNING: ' + text;
-                            break;
-                        case 'error':
-                            text = 'ERROR: ' + text;
-                            break;
-                        case 'debug':
-                            text = 'DEBUG: ' + text;
-                    }
-
                     // Give the line of text a CSS class with the same name as the line type so it can be styled if needed.
                     $line.addClass(line.type);
                     $line.appendTo($display);
