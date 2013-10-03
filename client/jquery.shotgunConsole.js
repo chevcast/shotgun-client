@@ -94,6 +94,8 @@
 
                     // Give the line of text a CSS class with the same name as the line type so it can be styled if needed.
                     $line.addClass(line.type);
+                    if (line.options.inverted) $line.addClass('inverted');
+                    $line.addClass(line.options.cssClass);
                     $line.appendTo($display);
 
                     // Create a callback function for coolType plugin.
