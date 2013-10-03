@@ -85,24 +85,17 @@
         ClientShell: function (options) {
 
             var clientShell = this,
-                saveContext,
                 send,
+                saveContext,
                 context = {},
-                // Default settings.
-                settings = {
+            // Default settings.
+                defaultSettings = {
                     namespace: 'shotgun',
                     debug: false
                 };
 
-            // Default functions.
-            saveContext = send = function () {
-                return clientShell;
-            },
-
             // Override default settings with supplied options.
-            extend(true, settings, options);
-
-            clientShell.context = {};
+            var settings = extend(true, {}, defaultSettings, options);
 
             // Instruct socket.io to connect to the server.
             clientShell.socket = io.connect('/' + settings.namespace);
@@ -117,11 +110,16 @@
             };
 
             // Create a function for setting up an onSaveContext callback.
-            clientShell.onSaveContext = function (callback) {
+            clientShell.onContextSave = function (callback) {
                 saveContext = function (context) {
                     callback(context);
                     return clientShell;
                 };
+                return clientShell;
+            };
+
+            // Default callback functions.
+            send = saveContext = function () {
                 return clientShell;
             };
 
@@ -154,8 +152,8 @@
 
             });
 
-            // Listen for our custom data socket.io event.
-            clientShell.socket.on('data', send);
+            // Listen for our custom data socket.io event and invoke our send callback.
+            clientShell.socket.on('data', function (data) { send(data); });
 
             // Create an execute function that looks similar to the shotgun shell execute function for ease of use.
             clientShell.execute = function (cmdStr, contextOverride, options) {

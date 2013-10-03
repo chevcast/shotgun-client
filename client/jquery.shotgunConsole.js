@@ -154,7 +154,7 @@
         }
 
         // When the context is updated update the CLI text and invoke the saveContext callback.
-        clientShell.onSaveContext(function (context) {
+        clientShell.onContextSave(function (context) {
             if (context.prompt)
                 $cliText.html(context.prompt.msg + cliText);
             else
