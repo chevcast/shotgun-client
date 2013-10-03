@@ -1,6 +1,6 @@
 {
   "name": "shotgun-client",
-  "version": "5.1.5",
+  "version": "5.1.6",
   "description": "A client component for node-shotgun that enables realtime communication with shotgun on the web server.",
   "main": "index.js",
   "scripts": {
