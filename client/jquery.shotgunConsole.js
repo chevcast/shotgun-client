@@ -29,6 +29,9 @@
                 $cliText: $cliText,
                 $cliContainer: $cliContainer
             },
+            defaultSettings = {
+                $scrollElement: $console
+            },
             lineQueue = [],
             cliHistory = [],
             cliIndex = -1,
@@ -36,6 +39,9 @@
             saveContext,
             api;
 
+        var settings = extend({}, defaultSettings, options);
+
+        // Defaults
         saveContext = send = function () {
             return api;
         };
@@ -133,7 +139,7 @@
                         onComplete();
                     }
 
-                    $console.scrollTop($console[0].scrollHeight);
+                    settings.$scrollElement.scrollTop(settings.$scrollElement[0].scrollHeight);
                 }
 
                 // Add the line of text to the queue.
