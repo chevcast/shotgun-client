@@ -88,7 +88,7 @@
                 send,
                 saveContext,
                 context = {},
-            // Default settings.
+                // Default settings.
                 defaultSettings = {
                     namespace: 'shotgun',
                     debug: false

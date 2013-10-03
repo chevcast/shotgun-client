@@ -42,7 +42,7 @@
 
         // Setup api object to pass back.
         api = {
-            onSaveContext: function (callback) {
+            onContextSave: function (callback) {
                 saveContext = function (context) {
                     callback(context);
                     return api;
