@@ -40,7 +40,7 @@
             api;
 
         // Override default settings with the supplied options.
-        var settings = extend({}, defaultSettings, options);
+        var settings = $.extend({}, defaultSettings, options);
 
         // If the user passed a string selector then turn it into a wrapped set.
         if (typeof(settings.$scrollElement) === 'string')
