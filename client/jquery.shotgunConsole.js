@@ -82,7 +82,7 @@
                 // Declare function to write out lines of text from the queue.
                 function writeLines() {
                     var line = lineQueue.shift(),
-                        $line = $('<div>'),
+                        $line = $('<div>').addClass('line'),
                         // Preserve multiple spaces and remove newline characters.
                         // Browsers like to shrink multiple spaces down to a single space.
                         text = line.text.replace(/(  +)/g, function (match) {
@@ -95,6 +95,10 @@
                     // Give the line of text a CSS class with the same name as the line type so it can be styled if needed.
                     $line.addClass(line.type);
                     if (line.options.inverted) $line.addClass('inverted');
+                    if (line.options.bold) $line.addClass('bold');
+                    if (line.options.italic) $line.addClass('italic');
+                    if (line.options.underline) $line.addClass('underline');
+                    if (line.options.cssRules) $line.attr('style', $line.attr('style') + line.options.cssRules);
                     $line.addClass(line.options.cssClass);
                     $line.appendTo($display);
 
