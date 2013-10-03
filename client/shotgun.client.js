@@ -170,7 +170,7 @@
                             value = components[1];
                         if (name.indexOf(settings.namespace + '|') === 0) {
                             name = name.replace(settings.namespace + '|', '');
-                            clientShell.context.cookies[name] = decodeURIComponent(value);
+                            context.cookies[name] = decodeURIComponent(value);
                         }
                     });
                 clientShell.socket.emit('execute', cmdStr, context, options);
