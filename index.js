@@ -63,6 +63,13 @@ exports.attach = function (server) {
             return shell.setVar('newCookies', newCookies);
         };
 
+        // Create a shell helper function for retrieving a cookie.
+        shell.getCookie = function (name) {
+            var cookies = shell.getVar(name);
+            if (!cookies) return;
+            if (cookies.hasOwnProperty(name)) return cookies[name];
+        };
+
         // Setup socket.io namespace for the current shell.
         sockets.of('/' + shell.settings.namespace)
             .on('connection', function (socket) {
