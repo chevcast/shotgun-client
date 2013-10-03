@@ -98,7 +98,7 @@
                     if (line.options.bold) $line.addClass('bold');
                     if (line.options.italic) $line.addClass('italic');
                     if (line.options.underline) $line.addClass('underline');
-                    if (line.options.cssRules) $line.attr('style', $line.attr('style') + line.options.cssRules);
+                    if (line.options.cssRules) $line.attr('style', line.options.cssRules);
                     $line.addClass(line.options.cssClass);
                     $line.appendTo($display);
 
