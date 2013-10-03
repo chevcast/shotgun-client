@@ -65,7 +65,7 @@ exports.attach = function (server) {
 
         // Create a shell helper function for retrieving a cookie.
         shell.getCookie = function (name) {
-            var cookies = shell.getVar(name);
+            var cookies = shell.getVar('cookies');
             if (!cookies) return;
             if (cookies.hasOwnProperty(name)) return cookies[name];
         };
