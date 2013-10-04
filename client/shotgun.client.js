@@ -106,7 +106,7 @@
                 var expiration = new Date();
                 expiration.setDate(expiration.getDate() + days);
                 value = encodeURIComponent(value) + ((days == null) ? "" : ";expires=" + expiration.toUTCString());
-                document.cookie = name + "=" + value;
+                document.cookie = settings.namespace + '-' + name + "=" + value;
             };
 
             // Create a function for setting up an onSaveContext callback.
@@ -168,8 +168,8 @@
                         var components = cookie.split('='),
                             name = components[0].trim(),
                             value = components[1];
-                        if (name.indexOf(settings.namespace + '|') === 0) {
-                            name = name.replace(settings.namespace + '|', '');
+                        if (name.indexOf(settings.namespace + '-') === 0) {
+                            name = name.replace(settings.namespace + '-', '');
                             context.cookies[name] = decodeURIComponent(value);
                         }
                     });

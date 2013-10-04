@@ -59,7 +59,7 @@ exports.attach = function (server) {
         // Create a shell helper function for setting cookies on the client.
         shell.setCookie = function (name, value, days) {
             var newCookies = shell.getVar('newCookies') || {};
-            newCookies[shell.settings.namespace + '|' + name] = { value: value, days: days };
+            newCookies[name] = { value: value, days: days };
             return shell.setVar('newCookies', newCookies);
         };
 
