@@ -1,6 +1,8 @@
 var io = require('socket.io'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    extend = require('extend'),
+    shellHelpers = require('./shotgun/shellHelpers');
 
 exports.attach = function (server) {
 
@@ -56,19 +58,8 @@ exports.attach = function (server) {
         // Add io to the shell for advanced users.
         shell.socketIo = io;
 
-        // Create a shell helper function for setting cookies on the client.
-        shell.setCookie = function (name, value, days) {
-            var newCookies = shell.getVar('newCookies') || {};
-            newCookies[name] = { value: value, days: days };
-            return shell.setVar('newCookies', newCookies);
-        };
-
-        // Create a shell helper function for retrieving a cookie.
-        shell.getCookie = function (name) {
-            var cookies = shell.getVar('cookies');
-            if (!cookies) return;
-            if (cookies.hasOwnProperty(name)) return cookies[name];
-        };
+        // Attach shotgun-client shell helpers to the shell instance so they are available to our command modules.
+        extend(shell, shellHelpers);
 
         // Setup socket.io namespace for the current shell.
         sockets.of('/' + shell.settings.namespace)
