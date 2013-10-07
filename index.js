@@ -1,4 +1,4 @@
-var io = require('socket.io'),
+var sio = require('socket.io'),
     fs = require('fs'),
     path = require('path'),
     extend = require('extend'),
@@ -46,7 +46,7 @@ exports.attach = function (server) {
     });
 
     // Instantiate socket.io server.
-    var sockets = io.listen(server, { log: false });
+    var io = sio.listen(server, { log: false });
 
     // Create an array of all arguments passed in except the first one.
     // The first argument was the http server and all other arguments are expected to be shotgun hell instances.
@@ -56,13 +56,13 @@ exports.attach = function (server) {
     shells.forEach(function (shell) {
 
         // Add io to the shell for advanced users.
-        shell.socketIo = io;
+        shell.io = io;
 
         // Attach shotgun-client shell helpers to the shell instance so they are available to our command modules.
         extend(shell, shellHelpers);
 
         // Setup socket.io namespace for the current shell.
-        sockets.of('/' + shell.settings.namespace)
+        io.of('/' + shell.settings.namespace)
             .on('connection', function (socket) {
 
                 // Listen for our custom "execute" socket.io event.
@@ -95,6 +95,6 @@ exports.attach = function (server) {
 
     // Return any relevant internals for shotgun-client.
     return {
-        sockets: sockets
+        io: io
     };
 };
