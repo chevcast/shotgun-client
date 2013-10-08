@@ -85,7 +85,6 @@
         ClientShell: function (options) {
 
             var clientShell = this,
-                send,
                 saveContext,
                 context = {},
                 // Default settings.
@@ -119,13 +118,13 @@
             };
 
             // Default callback functions.
-            send = saveContext = function () {
+            clientShell.send = saveContext = function () {
                 return clientShell;
             };
 
             // Create a function for setting up an onData callback.
             clientShell.onData = function (callback) {
-                send = function (data) {
+                clientShell.send = function (data) {
                     callback(data);
                     return clientShell;
                 };
@@ -153,7 +152,87 @@
             });
 
             // Listen for our custom data socket.io event and invoke our send callback.
-            clientShell.socket.on('data', function (data) { send(data); });
+            clientShell.socket.on('data', function (data) { clientShell.send(data); });
+
+            clientShell.clearDisplay = function () {
+                return clientShell.send({ clearDisplay: true });
+            };
+
+            clientShell.exit = function () {
+                return clientShell.send({ exit: true });
+            };
+
+            clientShell.password = function () {
+                return clientShell.send({ password: true });
+            };
+
+            clientShell.log = function (text, options) {
+                return clientShell.send({
+                    line: {
+                        options: options || {},
+                        type: 'log',
+                        text: text ? text.toString() : ''
+                    }
+                });
+            };
+            clientShell.warn = function (text, options) {
+                return clientShell.send({
+                    line: {
+                        options: options || {},
+                        type: 'warn',
+                        text: text ? text.toString() : ''
+                    }
+                });
+            };
+            clientShell.error = function (text, options) {
+                return clientShell.send({
+                    line: {
+                        options: options || {},
+                        type: 'error',
+                        text: text ? text.toString() : ''
+                    }
+                });
+            };
+            clientShell.debug = function (text, options) {
+                return clientShell.send({
+                    line: {
+                        options: options || {},
+                        type: 'debug',
+                        text: text ? text.toString() : ''
+                    }
+                });
+            };
+            clientShell.edit = function (text) {
+                return clientShell.send({ edit: text });
+            };
+
+            clientShell.setVar = function (key, value) {
+                context[key] = value;
+                return saveContext();
+            };
+            clientShell.getVar = function (key) {
+                return context[key];
+            };
+            clientShell.delVar = function (key) {
+                if (!context.hasOwnProperty(key))
+                    return;
+                delete context[key];
+                return saveContext();
+            };
+            clientShell.setPrompt = function(key, cmdName, options, msg) {
+                var prompt = {
+                    option: key,
+                    cmd: cmdName,
+                    options: options,
+                    msg: msg || key
+                };
+                return clientShell.setVar('prompt', prompt);
+            };
+            clientShell.clearPrompt = clientShell.delVar.bind(clientShell, 'prompt');
+            clientShell.resetContext = function() {
+                context = {};
+                return saveContext();
+            };
 
             // Create an execute function that looks similar to the shotgun shell execute function for ease of use.
             clientShell.execute = function (cmdStr, contextOverride, options) {
