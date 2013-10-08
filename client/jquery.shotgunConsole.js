@@ -27,7 +27,8 @@
                 $display: $display,
                 $cli: $cli,
                 $cliText: $cliText,
-                $cliContainer: $cliContainer
+                $cliContainer: $cliContainer,
+                $scrollElement: $console
             },
             defaultSettings = {
                 $scrollElement: $console
@@ -46,6 +47,9 @@
         // If the user passed a string selector then turn it into a wrapped set.
         if (typeof(settings.$scrollElement) === 'string')
             settings.$scrollElement = $(settings.$scrollElement);
+
+        // Attach specified scroll element to UI object.
+        ui.$scrollElement = settings.$scrollElement;
 
         // Defaults
         saveContext = send = function () {
