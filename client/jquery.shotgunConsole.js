@@ -32,7 +32,8 @@
             defaultSettings = {
                 $scrollElement: $console
             },
-            lineQueue = [],
+            queue = [],
+            processingQueue = false,
             cliHistory = [],
             cliIndex = -1,
             send,
@@ -78,7 +79,21 @@
         };
 
         // Declare function for parsing the data received from shotgun.
-        function parseData(data) {
+        function parseData() {
+
+            // Set processingQueue to true.
+            if (!processingQueue) processingQueue = true;
+
+            // Declare a function to call when finished with this data object.
+            function onComplete() {
+                if (queue.length > 0)
+                    parseData();
+                else
+                    processingQueue = false;
+            }
+
+            // Grab the next data item in the queue.
+            var data = queue.shift();
 
             // If clearDisplay:true then empty the $display element.
             if (data.clearDisplay) $display.html('');
@@ -90,76 +105,54 @@
             // If there is an edit property then insert its content into the CLI.
             if (data.edit)
                 $cli.val(data.edit);
-
             // If there is a line object then display it.
             if (data.line) {
+                var $line = $('<div>').addClass('line'),
+                // Preserve multiple spaces and remove newline characters.
+                // Browsers like to shrink multiple spaces down to a single space.
+                    text = data.line.text.replace(/(  +)/g, function (match) {
+                        return new Array(match.length + 1).join('&nbsp;');
+                    }).replace(/(\r\n|\r|\n)/, '');
 
-                // Declare function to write out lines of text from the queue.
-                function writeLines() {
-                    var line = lineQueue.shift(),
-                        $line = $('<div>').addClass('line'),
-                        // Preserve multiple spaces and remove newline characters.
-                        // Browsers like to shrink multiple spaces down to a single space.
-                        text = line.text.replace(/(  +)/g, function (match) {
-                            return new Array(match.length + 1).join('&nbsp;');
-                        }).replace(/(\r\n|\r|\n)/, '');
+                // If text is empty then force a non-breaking space for compatibility with JQuery and coolType.
+                text = text.length > 0 ? text : '&nbsp;';
 
-                    // If text is empty then force a non-breaking space for compatibility with JQuery and coolType.
-                    text = text.length > 0 ? text : '&nbsp;';
+                // Give the line of text a CSS class with the same name as the line type so it can be styled if needed.
+                $line.addClass(data.line.type);
+                if (data.line.options.inverted) $line.addClass('inverted');
+                if (data.line.options.bold) $line.addClass('bold');
+                if (data.line.options.italic) $line.addClass('italic');
+                if (data.line.options.underline) $line.addClass('underline');
+                if (data.line.options.cssRules) $line.attr('style', data.line.options.cssRules);
+                $line.addClass(data.line.options.cssClass);
+                $line.appendTo($display);
 
-                    // Give the line of text a CSS class with the same name as the line type so it can be styled if needed.
-                    $line.addClass(line.type);
-                    if (line.options.inverted) $line.addClass('inverted');
-                    if (line.options.bold) $line.addClass('bold');
-                    if (line.options.italic) $line.addClass('italic');
-                    if (line.options.underline) $line.addClass('underline');
-                    if (line.options.cssRules) $line.attr('style', line.options.cssRules);
-                    $line.addClass(line.options.cssClass);
-                    $line.appendTo($display);
-
-                    // Create a callback function for coolType plugin.
-                    function onComplete() {
-                        // If the queue is empty then finish.
-                        if (lineQueue.length == 0)
-                            $console.data('busy', false);
-                        // Otherwise continue writing lines.
-                        else
-                            writeLines();
-                    }
-
-                    // If coolType plugin is available and dontType:false then pass the text to coolType.
-                    if ('coolType' in $.fn && !line.options.dontType) {
-                        // Default coolType options.
-                        var coolTypeOptions = {
-                            typeSpeed: 0,
-                            delayBeforeType: 0,
-                            delayAfterType: 0,
-                            onComplete: onComplete
-                        };
-                        // If the command module specified coolType options then override the defaults with them.
-                        if (line.options.coolTypeOptions)
-                            $.extend(true, coolTypeOptions, line.options.coolTypeOptions);
-                        // Pass the text and options to coolType.
-                        $line.coolType(text, coolTypeOptions);
-                    }
-                    // Otherwise simply display the whole line instantly and invoke the callback immediately.
-                    else {
-                        $line.html(text);
-                        onComplete();
-                    }
-
-                    settings.$scrollElement.scrollTop(settings.$scrollElement[0].scrollHeight);
+                // If coolType plugin is available and dontType:false then pass the text to coolType.
+                if ('coolType' in $.fn && !data.line.options.dontType) {
+                    // Default coolType options.
+                    var coolTypeOptions = {
+                        typeSpeed: 0,
+                        delayBeforeType: 0,
+                        delayAfterType: 0,
+                        onComplete: onComplete
+                    };
+                    // If the command module specified coolType options then override the defaults with them.
+                    if (data.line.options.coolTypeOptions)
+                        $.extend(true, coolTypeOptions, data.line.options.coolTypeOptions);
+                    // Pass the text and options to coolType.
+                    $line.coolType(text, coolTypeOptions);
+                }
+                // Otherwise simply display the whole line instantly and invoke the callback immediately.
+                else {
+                    $line.html(text);
+                    onComplete();
                 }
 
-                // Add the line of text to the queue.
-                lineQueue.push(data.line);
-
-                // If writeLines is not already processing lines in the queue then start it.
-                if (!$console.data('busy')) {
-                    $console.data('busy', true);
-                    writeLines();
-                }
+                // Scroll to bottom.
+                settings.$scrollElement.scrollTop(settings.$scrollElement[0].scrollHeight);
             }
+            else
+                onComplete();
         }
 
         // When the context is updated update the CLI text and invoke the saveContext callback.
@@ -173,7 +166,8 @@
 
         // When data is received call parseData and invoke the send callback.
         clientShell.onData(function (data) {
-            parseData(data);
+            queue.push(data);
+            if (!processingQueue) parseData();
             send(data);
         });
 
