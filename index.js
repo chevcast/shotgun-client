@@ -79,8 +79,10 @@ exports.attach = function (server) {
                         // If shotgun modifies the context then send it to the client via this client's
                         // socket connection so it can be stored in the browser.
                         .onContextSave(function (contextToSave) {
-                            if (contextToSave.hasOwnProperty('socket')) delete contextToSave.socket;
-                            socket.emit('saveContext', contextToSave);
+                            var updatedContext = extend({}, contextToSave);
+                            // Remove server-side socket from context before sending to client.
+                            if (updatedContext.hasOwnProperty('socket')) delete updatedContext.socket;
+                            socket.emit('saveContext', updatedContext);
                         })
                         // If shotgun sends any data then send it to the client to be handled.
                         .onData(function (data) {
