@@ -1,6 +1,6 @@
 {
   "name": "shotgun-client",
-  "version": "5.2.1",
+  "version": "5.3.0",
   "description": "A companion module that makes it easy to create [shotgun](https://github.com/Chevex/shotgun)-powered web applications.",
   "main": "index.js",
   "scripts": {
