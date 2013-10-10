@@ -376,7 +376,7 @@
                         $multiLineCli.replaceWith($singleLineCli).hide();
                         $singleLineCli.show().focus();
                         $cli = $singleLineCli;
-                        $cliText.css({ verticalAlign: 'none' });
+                        $cliText.css({ verticalAlign: 'initial' });
                     }
                     // If the user input was not password data then add the user input to the CLI text history.
                     else
