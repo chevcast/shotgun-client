@@ -430,6 +430,9 @@
             }
         });
 
+        // Store api object for easy access in the future.
+        $console.data('api', api);
+
         // Return our API object.
         return api;
     };
