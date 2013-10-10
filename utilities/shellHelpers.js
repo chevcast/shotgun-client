@@ -17,13 +17,14 @@ module.exports = exports = {
 
     // Create a shell helper function for deleting a cookie.
     delCookie: function (name) {
-        this.setCookie(name, null, -1);
+        return this.setCookie(name, null, -1);
     },
 
     // Create a shell send function that will broadcast to all clients.
     sendToAll: function (data) {
         var shell = this;
         shell.io.of('/' + shell.settings.namespace).emit('data', data);
+        return shell;
     },
 
     // Create a shell send function that will broadcast to all clients except the current one.
@@ -31,11 +32,12 @@ module.exports = exports = {
         var shell = this,
             socket = shell.getVar('socket');
         socket.broadcast.emit('data', data);
+        return shell;
     },
 
     // Create a shell send function for multi line inputs.
     multiLine: function () {
         var shell = this;
-        shell.send({ multiLine: true });
+        return shell.send({ multiLine: true });
     }
 };
