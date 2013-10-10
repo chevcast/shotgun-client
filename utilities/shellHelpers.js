@@ -35,6 +35,44 @@ module.exports = exports = {
         return shell;
     },
 
+    // Log helper functions.
+    logAll: function (text, options) {
+        return shell.sendAll({
+            line: {
+                options: options || {},
+                type: 'log',
+                text: text ? text.toString() : ''
+            }
+        });
+    },
+    warnAll: function (text, options) {
+        return shell.sendAll({
+            line: {
+                options: options || {},
+                type: 'warn',
+                text: text ? text.toString() : ''
+            }
+        });
+    },
+    error: function (text, options) {
+        return shell.sendAll({
+            line: {
+                options: options || {},
+                type: 'error',
+                text: text ? text.toString() : ''
+            }
+        });
+    },
+    debug: function (text, options) {
+        return shell.sendAll({
+            line: {
+                options: options || {},
+                type: 'debug',
+                text: text ? text.toString() : ''
+            }
+        });
+    },
+
     // Create a shell send function for multi line inputs.
     multiLine: function () {
         var shell = this;
