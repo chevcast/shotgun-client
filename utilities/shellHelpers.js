@@ -52,7 +52,7 @@ module.exports = exports = {
             }
         });
     },
-    error: function (text, options) {
+    errorAll: function (text, options) {
         return this.sendToAll({
             line: {
                 options: options || {},
@@ -61,7 +61,7 @@ module.exports = exports = {
             }
         });
     },
-    debug: function (text, options) {
+    debugAll: function (text, options) {
         return this.sendToAll({
             line: {
                 options: options || {},
