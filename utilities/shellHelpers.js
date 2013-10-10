@@ -22,22 +22,20 @@ module.exports = exports = {
 
     // Create a shell send function that will broadcast to all clients.
     sendToAll: function (data) {
-        var shell = this;
-        shell.io.of('/' + shell.settings.namespace).emit('data', data);
-        return shell;
+        this.io.of('/' + this.settings.namespace).emit('data', data);
+        return this;
     },
 
     // Create a shell send function that will broadcast to all clients except the current one.
     sendToOthers: function (data) {
-        var shell = this,
-            socket = shell.getVar('socket');
+        var socket = this.getVar('socket');
         socket.broadcast.emit('data', data);
-        return shell;
+        return this;
     },
 
     // Log helper functions.
     logAll: function (text, options) {
-        return shell.sendAll({
+        return this.sendAll({
             line: {
                 options: options || {},
                 type: 'log',
@@ -46,7 +44,7 @@ module.exports = exports = {
         });
     },
     warnAll: function (text, options) {
-        return shell.sendAll({
+        return this.sendAll({
             line: {
                 options: options || {},
                 type: 'warn',
@@ -55,7 +53,7 @@ module.exports = exports = {
         });
     },
     error: function (text, options) {
-        return shell.sendAll({
+        return this.sendAll({
             line: {
                 options: options || {},
                 type: 'error',
@@ -64,7 +62,7 @@ module.exports = exports = {
         });
     },
     debug: function (text, options) {
-        return shell.sendAll({
+        return this.sendAll({
             line: {
                 options: options || {},
                 type: 'debug',
@@ -75,7 +73,6 @@ module.exports = exports = {
 
     // Create a shell send function for multi line inputs.
     multiLine: function () {
-        var shell = this;
-        return shell.send({ multiLine: true });
+        return this.send({ multiLine: true });
     }
 };
