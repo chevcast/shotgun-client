@@ -35,7 +35,7 @@ module.exports = exports = {
 
     // Log helper functions.
     logAll: function (text, options) {
-        return this.sendAll({
+        return this.sendToAll({
             line: {
                 options: options || {},
                 type: 'log',
@@ -44,7 +44,7 @@ module.exports = exports = {
         });
     },
     warnAll: function (text, options) {
-        return this.sendAll({
+        return this.sendToAll({
             line: {
                 options: options || {},
                 type: 'warn',
@@ -53,7 +53,7 @@ module.exports = exports = {
         });
     },
     error: function (text, options) {
-        return this.sendAll({
+        return this.sendToAll({
             line: {
                 options: options || {},
                 type: 'error',
@@ -62,7 +62,7 @@ module.exports = exports = {
         });
     },
     debug: function (text, options) {
-        return this.sendAll({
+        return this.sendToAll({
             line: {
                 options: options || {},
                 type: 'debug',
