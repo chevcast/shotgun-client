@@ -414,10 +414,6 @@
 
         // Implement CLI text history arrows.
         $cliContainer.keydown(function (e) {
-            // Determine first and last lines in the multiLine input.
-            var firstLine = $multiLineCli.val().indexOf('\n'),
-                lastLine = $multiLineCli.val().lastIndexOf('\n'),
-                cursor = $multiLineCli.getCursorPosition();
 
             switch (e.which) {
 
