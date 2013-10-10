@@ -337,7 +337,8 @@
 
             // If there is an edit property then insert its content into the CLI.
             if (data.edit)
-                $cli.val(data.edit);
+                $cli.val(data.edit).setCursorPosition($cli.val().length);
+
             // If there is a line object then display it.
             if (data.line) {
                 var $line = $('<div>').addClass('line'),
