@@ -268,7 +268,7 @@
 
             // If multiLine:true then change the $cli input to a textarea.
             if (data.multiLine) {
-                $multiLineCli.val($cli.val());
+                $multiLineCli.height('auto').val($cli.val());
                 $singleLineCli.replaceWith($multiLineCli).hide();
                 $multiLineCli.show().elastic().focus();
                 $cli = $multiLineCli;
