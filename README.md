@@ -5,9 +5,9 @@
 
 > A companion module that makes it easy to create [shotgun](https://github.com/chevex/shotgun)-powered web applications.
 
-![](http://i.imgur.com/PvLNexQ.gif)
+[Looking for shotgun instead?](https://github.com/chevex/shotgun)
 
-[Looking for shotgun?](https://github.com/chevex/shotgun)
+![](http://i.imgur.com/PvLNexQ.gif)
 
 - [Documentation](https://github.com/Chevex/shotgun-client/wiki)
 - [Source](https://github.com/Chevex/shotgun-client)
