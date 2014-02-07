@@ -153,7 +153,7 @@
             cliText = '&gt;&nbsp;',
             $display = $('<div>').appendTo($console),
             $cliContainer = $('<div>')
-                .css({ marginTop: '15px' })
+                .css({ marginTop: '10px' })
                 .appendTo($console),
             $cliText = $('<span>')
                 .html(cliText)
@@ -201,9 +201,7 @@
             processingQueue = false,
             cliHistory = [],
             cliIndex = -1,
-            send,
-            saveContext,
-            api;
+            saveContext;
 
         // Override default settings with the supplied options.
         var settings = $.extend({}, defaultSettings, options);
@@ -214,117 +212,87 @@
         // Attach specified scroll element to UI object.
         ui.$scrollElement = settings.$scrollElement;
 
-        // Defaults
-        saveContext = send = function () {
-            return api;
-        };
+        // Attach ui elements to client shell.
+        clientShell.ui = ui;
 
-        // Setup api object to pass back.
-        api = {
-            onContextSave: function (callback) {
-                saveContext = function (context) {
-                    callback(context);
-                    return api;
-                };
-                return api;
-            },
-            onData: function (callback) {
-                send = function (data) {
-                    callback(data);
-                    return api;
-                };
-                return api;
-            },
-            execute: function (cmdStr, context, options) {
-                clientShell.execute(cmdStr, context, options);
-                return api;
-            },
-            clientShell: clientShell,
-            ui: ui
-        };
+        // Clear $display contents.
+        clientShell.on('clear', function () {
+            $display.html('');
+        });
 
-        // Declare function for parsing the data received from shotgun.
-        function parseData() {
+        // Change $cli input type to password.
+        clientShell.on('password', function () {
+            $cli.attr('type', 'password');
+        });
 
-            // Set processingQueue to true.
-            if (!processingQueue) processingQueue = true;
+        // Change $cli to multiline.
+        clientShell.on('multiline', function () {
+            $multiLineCli.height('auto').val($cli.val());
+            $singleLineCli.replaceWith($multiLineCli).hide();
+            $multiLineCli.show().elastic().focus();
+            $cli = $multiLineCli;
+            $cliText.css({ verticalAlign: 'top' });
+        });
 
-            // Declare a function to call when finished with this data object.
-            function onComplete() {
-                if (queue.length > 0)
-                    parseData();
-                else
+        // Insert text into CLI.
+        clientShell.on('edit', function (text) {
+            $cli.val(text).elastic().focus()[0].setSelectionRange(0, $cli.val().length);
+        });
+
+        // Write text to console.
+        clientShell.on('log', function (text, options) {
+            queue.push({ text: text, options: options });
+            if (processingQueue) return;
+
+            function nextLine() {
+                if (queue.length === 0) {
                     processingQueue = false;
-            }
+                    return;
+                }
 
-            // Grab the next data item in the queue.
-            var data = queue.shift();
+                var line = queue.shift(),
+                    $line = $('<div>').addClass('line');
 
-            // If clearDisplay:true then empty the $display element.
-            if (data.clearDisplay) $display.html('');
-
-            // If password:true then change the $cli input type to password.
-            if (data.password)
-                $cli.attr('type', 'password');
-
-            // If multiLine:true then change the $cli input to a textarea.
-            if (data.multiLine) {
-                $multiLineCli.height('auto').val($cli.val());
-                $singleLineCli.replaceWith($multiLineCli).hide();
-                $multiLineCli.show().elastic().focus();
-                $cli = $multiLineCli;
-                $cliText.css({ verticalAlign: 'top' });
-            }
-
-            // If there is an edit property then insert its content into the CLI.
-            if (data.edit)
-                $cli.val(data.edit).elastic().focus()[0].setSelectionRange(0, $cli.val().length);
-
-            // If there is a line object then display it.
-            if (data.line) {
-                var $line = $('<div>').addClass('line'),
                 // Preserve multiple spaces and remove newline characters.
                 // Browsers like to shrink multiple spaces down to a single space.
-                    text = data.line.text.replace(/(  +)/g, function (match) {
-                        return new Array(match.length + 1).join('&nbsp;');
-                    }).replace(/(\r\n|\r|\n)/, '');
+                line.text = line.text.replace(/(  +)/g, function (match) {
+                    return new Array(match.length + 1).join('&nbsp;');
+                }).replace(/(\r\n|\r|\n)/, '');
 
                 // If text is empty then force a non-breaking space for compatibility with JQuery and coolType.
-                text = text.length > 0 ? text : '&nbsp;';
+                line.text = line.text.length > 0 ? line.text : '&nbsp;';
 
-                // Give the line of text a CSS class with the same name as the line type so it can be styled if needed.
-                $line.addClass(data.line.type);
-                if (data.line.options.inverted) $line.addClass('inverted');
-                if (data.line.options.bold) $line.addClass('bold');
-                if (data.line.options.italic) $line.addClass('italic');
-                if (data.line.options.underline) $line.addClass('underline');
-                if (data.line.options.cssRules) $line.attr('style', data.line.options.cssRules);
-                $line.addClass(data.line.options.cssClass);
+                if (line.options.inverted) $line.addClass('inverted');
+                if (line.options.bold) $line.addClass('bold');
+                if (line.options.italic) $line.addClass('italic');
+                if (line.options.underline) $line.addClass('underline');
+                if (line.options.cssRules) $line.attr('style', line.options.cssRules);
+                $line.addClass(line.options.cssClass);
                 $line.appendTo($display);
 
                 // If coolType plugin is available and dontType:false then pass the text to coolType.
-                if ('coolType' in $.fn && !data.line.options.dontType) {
+                if ('coolType' in $.fn && !line.options.dontType) {
                     // Default coolType options.
                     var coolTypeOptions = {
                         typeSpeed: 0,
                         delayBeforeType: 0,
                         delayAfterType: 0,
-                        onComplete: onComplete
+                        onComplete: nextLine
                     };
                     // If the command module specified coolType options then override the defaults with them.
-                    if (data.line.options.coolTypeOptions)
-                        $.extend(true, coolTypeOptions, data.line.options.coolTypeOptions);
+                    if (line.options.coolTypeOptions)
+                        $.extend(true, coolTypeOptions, line.options.coolTypeOptions);
                     // Pass the text and options to coolType.
-                    $line.coolType(text, coolTypeOptions);
+                    $line.coolType(line.text, coolTypeOptions);
                 }
                 // Otherwise simply display the whole line instantly and invoke the callback immediately.
                 else {
-                    $line.html(text);
-                    onComplete();
+                    $line.html(line.text);
+                    nextLine();
                 }
 
                 // Scroll to bottom immediately.
-                if (!data.line.options.dontScroll) {
+                if (!line.options.dontScroll) {
                     settings.$scrollElement.scrollTo('100%', 0, { axis: 'y' });
                     // Also attach a handler to images to scroll to bottom again when they're done loading.
                     $display.find('img').load(function () {
@@ -332,26 +300,19 @@
                     });
                 }
             }
-            else
-                onComplete();
-        }
 
-        // When the context is updated update the CLI text and invoke the saveContext callback.
-        clientShell.onContextSave(function (context) {
-            if (context.prompt)
-                $cliText.html(context.prompt.msg + cliText);
+            processingQueue = true;
+            nextLine();
+        });
+
+        // Update context text when context changes.
+        clientShell.on('contextChanged', function (contextData) {
+            if (contextData.prompt)
+                $cliText.html(contextData.prompt.msg + cliText);
             else
                 $cliText.html(cliText);
-            saveContext(context);
         });
-
-        // When data is received call parseData and invoke the send callback.
-        clientShell.onData(function (data) {
-            queue.push(data);
-            if (!processingQueue) parseData();
-            send(data);
-        });
-
+            
         // Declare an enum for the keyboard input we are interested in.
         var keys = {
             enter: 13,
@@ -437,10 +398,10 @@
             }
         });
 
-        // Store api object for easy access in the future.
-        $console.data('api', api);
+        // Store client shell object for easy access in the future.
+        $console.data('clientShell', clientShell);
 
-        // Return our API object.
-        return api;
+        // Return our clientShell object.
+        return clientShell;
     };
 })(jQuery);

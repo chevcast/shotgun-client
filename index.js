@@ -2,18 +2,19 @@ var sio = require('socket.io'),
     fs = require('fs'),
     path = require('path'),
     extend = require('extend'),
+    async = require('async'),
     shellHelpers = require('./utilities/shellHelpers'),
     shellSettings = require('./utilities/shellSettings');
 
 exports.attach = function (server) {
 
-    // Store all the request listeners already defined on this server.
+    // Store all the request listeners already defined on this http server.
     var oldListeners = server.listeners('request').splice(0);
 
-    // Remove all the request listeners already defined on this server.
+    // Remove all the request listeners already defined on this http server.
     server.removeAllListeners('request');
 
-    // Add our own request listener.
+    // Add our own request listener to the http server.
     server.on('request', function (req, res) {
 
         // If the request URL does not match the one we want to handle then invoke the pre-existing request listeners.
@@ -22,26 +23,30 @@ exports.attach = function (server) {
                 oldListeners[i].call(server, req, res);
             }
         }
+
         // If the URL does match then serve up the following scripts:
-        // - socket.io.js
-        // - shotgun.client.js
-        // - jquery.cooltype.js
-        // - jquery.shotgunConsole.js
         else {
-            try {
-                fs.readFile(path.join(__dirname, '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'), function (err, socketIoClient) {
-                    fs.readFile(path.join(__dirname, '/client/shotgun.client.js'), function (err, shotgunClient) {
-                        fs.readFile(path.join(__dirname, '/client/jquery.cooltype.js'), function (err, jqueryCoolType) {
-                            fs.readFile(path.join(__dirname, '/client/jquery.shotgunConsole.js'), function (err, jqueryShotgunConsole) {
-                                res.writeHead(200, { 'Content-Type': 'application/javascript' });
-                                res.end(socketIoClient + '\n\n' + shotgunClient + '\n\n' + jqueryCoolType + '\n\n' + jqueryShotgunConsole);
-                            });
-                        });
-                    });
-                });
-            }
-            catch (e) {
-            }
+            var filePaths = [
+                // socket.io
+                '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js',
+                // shotgun client
+                '/client/shotgun.client.js',
+                // cooltype
+                '/client/jquery.cooltype.js',
+                // shotgunConsole
+                '/client/jquery.shotgunConsole.js'
+            ], readFuncs = [];
+
+            filePaths.forEach(function (filePath) {
+                filePath = path.join(__dirname, filePath);
+                readFuncs.push(fs.readFile.bind(fs, filePath));
+            });
+
+            async.parallel(readFuncs, function (err, files) {
+                if (err) throw err;
+                res.writeHead(200, { 'Content-Type': 'application/javascript' });
+                res.end(files.join('\n\n'));
+            });
         }
 
     });
@@ -69,7 +74,7 @@ exports.attach = function (server) {
         io.of('/' + shell.settings.namespace)
             .on('connection', function (socket) {
 
-                // Listen for our custom "execute" socket.io event.
+                // Listen for our custom "execute" socket.io event and invoke "execute" on the shell.
                 socket.on('execute', function (cmdStr, context, options) {
 
                     // Add current socket to context for advanced users.
@@ -80,19 +85,21 @@ exports.attach = function (server) {
 
                     // Configure the shell for this execution.
                     shell
-                        // If shotgun modifies the context then send it to the client via this client's
-                        // socket connection so it can be stored in the browser.
-                        .onContextSave(function (contextToSave) {
-                            var updatedContext = extend({}, contextToSave);
-                            // Remove server-side socket from context before sending to client.
-                            if (updatedContext.hasOwnProperty('socket')) delete updatedContext.socket;
-                            socket.emit('saveContext', updatedContext);
+                        // Remove the "any" listener.
+                        .offAny()
+                        // Attach a new "any" listener for this request.
+                        .onAny(function () {
+                            if (this.event === 'contextChanged') {
+                                var contextData = arguments[0];
+                                delete contextData.socket;
+                                socket.emit('contextChanged', contextData);
+                                return;
+                            }
+                            var args = Array.prototype.splice.call(arguments, 0);
+                            args.unshift(this.event);
+                            socket.emit.apply(socket, args);
                         })
-                        // If shotgun sends any data then send it to the client to be handled.
-                        .onData(function (data) {
-                            socket.emit('data', data);
-                        })
-                        // Execute the shell.
+                        // Instruct the shell to process the command string for this request.
                         .execute(cmdStr, context, options);
                 });
 
@@ -101,6 +108,7 @@ exports.attach = function (server) {
 
     // Return any relevant internals for shotgun-client.
     return {
-        io: io
+        io: io,
+        shells: shells
     };
 };

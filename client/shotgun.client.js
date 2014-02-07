@@ -85,7 +85,6 @@
         ClientShell: function (options) {
 
             var clientShell = this,
-                saveContext,
                 context = {},
                 // Default settings.
                 defaultSettings = {
@@ -97,151 +96,16 @@
             var settings = extend(true, {}, defaultSettings, options);
 
             // Instruct socket.io to connect to the server.
-            clientShell.socket = io.connect('/' + settings.namespace);
-
-            // Create a function for setting cookies in the browser.
-            clientShell.setCookie = function(name, value, days)
-            {
-                var expiration = new Date();
-                expiration.setDate(expiration.getDate() + days);
-                value = encodeURIComponent(value) + ((days == null) ? "" : ";expires=" + expiration.toUTCString());
-                document.cookie = settings.namespace + '-' + name + "=" + value;
-            };
-
-            // Create a function for setting up an onSaveContext callback.
-            clientShell.onContextSave = function (callback) {
-                saveContext = function (context) {
-                    callback(context);
-                    return clientShell;
-                };
+            var socket = clientShell.socket = io.connect('/' + settings.namespace);
+            
+            // Proxy any listeners onto the socket itself.
+            clientShell.on = function () {
+                socket.on.apply(socket, arguments);
                 return clientShell;
             };
 
-            // Default callback functions.
-            clientShell.send = saveContext = function () {
-                return clientShell;
-            };
-
-            // Create a function for setting up an onData callback.
-            clientShell.onData = function (callback) {
-                clientShell.send = function (data) {
-                    callback(data);
-                    return clientShell;
-                };
-                return clientShell;
-            };
-
-            // Listen for our custom contextSave socket.io event.
-            clientShell.socket.on('saveContext', function (contextToSave) {
-
-                // Store updated context.
-                context = contextToSave;
-
-                // Check if shotgun declared any new cookies and set them.
-                if (context.newCookies)
-                    for (var name in context.newCookies) {
-                        if (context.newCookies.hasOwnProperty(name)) {
-                            var cookie = context.newCookies[name];
-                            clientShell.setCookie(name, cookie.value, cookie.days);
-                        }
-                    }
-
-                // Invoke callback.
-                saveContext(context);
-
-            });
-
-            // Listen for our custom data socket.io event and invoke our send callback.
-            clientShell.socket.on('data', function (data) { clientShell.send(data); });
-
-            clientShell.clearDisplay = function () {
-                return clientShell.send({ clearDisplay: true });
-            };
-
-            clientShell.exit = function () {
-                return clientShell.send({ exit: true });
-            };
-
-            clientShell.password = function () {
-                return clientShell.send({ password: true });
-            };
-
-            clientShell.log = function (text, options) {
-                return clientShell.send({
-                    line: {
-                        options: options || {},
-                        type: 'log',
-                        text: text ? text.toString() : ''
-                    }
-                });
-            };
-            clientShell.warn = function (text, options) {
-                return clientShell.send({
-                    line: {
-                        options: options || {},
-                        type: 'warn',
-                        text: text ? text.toString() : ''
-                    }
-                });
-            };
-            clientShell.error = function (text, options) {
-                return clientShell.send({
-                    line: {
-                        options: options || {},
-                        type: 'error',
-                        text: text ? text.toString() : ''
-                    }
-                });
-            };
-            clientShell.debug = function (text, options) {
-                return clientShell.send({
-                    line: {
-                        options: options || {},
-                        type: 'debug',
-                        text: text ? text.toString() : ''
-                    }
-                });
-            };
-            clientShell.edit = function (text) {
-                return clientShell.send({ edit: text });
-            };
-
-            clientShell.setVar = function (key, value) {
-                context[key] = value;
-                return saveContext();
-            };
-            clientShell.getVar = function (key) {
-                return context[key];
-            };
-            clientShell.delVar = function (key) {
-                if (!context.hasOwnProperty(key))
-                    return;
-                delete context[key];
-                return saveContext();
-            };
-            clientShell.setPrompt = function(key, cmdName, options, msg) {
-                var prompt = {
-                    option: key,
-                    cmd: cmdName,
-                    options: options,
-                    msg: msg || key
-                };
-                return clientShell.setVar('prompt', prompt);
-            };
-            clientShell.clearPrompt = clientShell.delVar.bind(clientShell, 'prompt');
-            clientShell.resetContext = function() {
-                context = {};
-                return saveContext();
-            };
-
-            // Create an execute function that looks similar to the shotgun shell execute function for ease of use.
-            clientShell.execute = function (cmdStr, contextOverride, options) {
-
-                // If a context was passed in then override the stored context with it.
-                if (contextOverride) context = contextOverride;
-
-                // Create a cookies property on the context and fill it with all the cookies for this shell.
-                context.cookies = {};
+            function getCookies() {
+                var cookies = {};
                 if (document.cookie.length > 0)
                     document.cookie.split(';').forEach(function (cookie) {
                         var components = cookie.split('='),
@@ -249,13 +113,40 @@
                             value = components[1];
                         if (name.indexOf(settings.namespace + '-') === 0) {
                             name = name.replace(settings.namespace + '-', '');
-                            context.cookies[name] = decodeURIComponent(value);
+                            cookies[name] = decodeURIComponent(value);
                         }
                     });
-                clientShell.socket.emit('execute', cmdStr, context, options);
+                return cookies;
+            }
 
+            clientShell
+                // Save context when it changes.
+                .on('contextChanged', function (contextData) {
+                    context = contextData;
+                })
+                // Create a function for setting cookies in the browser.
+                .on('setCookie', function (name, value, days) {
+                    var expiration = new Date();
+                    expiration.setDate(expiration.getDate() + days);
+                    value = encodeURIComponent(value) + ((days == null) ? "" : ";expires=" + expiration.toUTCString());
+                    document.cookie = settings.namespace + '-' + name + "=" + value;
+                })
+                .on('getCookie', function (name, callback) {
+                    // Create a cookies property on the context and fill it with all the cookies for this shell.
+                    var cookies = getCookies();
+                    callback(cookies[name]);
+                })
+                .on('getAllCookies', function (callback) {
+                    var cookies = getCookies();
+                    callback(cookies);
+                });
+
+            // Create an execute function that looks similar to the shotgun shell execute function for ease of use.
+            clientShell.execute = function (cmdStr, contextOverride, options) {
+                // If a context was passed in then override the stored context with it.
+                if (contextOverride) context = contextOverride;
+                socket.emit('execute', cmdStr, context, options);
                 return clientShell;
-
             };
 
             return clientShell;
