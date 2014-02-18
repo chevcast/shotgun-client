@@ -33,9 +33,13 @@ exports.attach = function (server) {
                 '/client/shotgun.client.js',
                 // cooltype
                 '/client/jquery.cooltype.js',
-                // shotgunConsole
-                '/client/jquery.shotgunConsole.js'
+                // JQuery plugin
+                '/client/jquery.shotgunConsole.js',
+                // AngularJS Directive
+                '/client/angular.shotgunConsole.js'
             ], readFuncs = [];
+
+            // TODO: Conditionally load plugins via query string value.
 
             filePaths.forEach(function (filePath) {
                 filePath = path.join(__dirname, filePath);
