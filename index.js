@@ -89,19 +89,29 @@ exports.attach = function (server) {
 
                     // Configure the shell for this execution.
                     shell
+                        .removeAllListeners('error')
+                        // Log errors out to the console.
+                        .on('error', function (err) {
+                            shell.log(err);
+                        })
                         // Remove the "any" listener.
                         .offAny()
                         // Attach a new "any" listener for this request.
                         .onAny(function () {
-                            if (this.event === 'contextChanged') {
-                                var contextData = arguments[0];
-                                delete contextData.socket;
-                                socket.emit('contextChanged', contextData);
-                                return;
+                            switch (this.event) {
+                                case 'error':
+                                    break;
+                                case 'contextChanged':
+                                    var contextData = arguments[0];
+                                    delete contextData.socket;
+                                    socket.emit('contextChanged', contextData);
+                                    break;
+                                default:
+                                    var args = Array.prototype.splice.call(arguments, 0);
+                                    args.unshift(this.event);
+                                    socket.emit.apply(socket, args);
+                                    break;
                             }
-                            var args = Array.prototype.splice.call(arguments, 0);
-                            args.unshift(this.event);
-                            socket.emit.apply(socket, args);
                         })
                         // Instruct the shell to process the command string for this request.
                         .execute(cmdStr, context, options);

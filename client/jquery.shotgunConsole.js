@@ -148,7 +148,7 @@
 
     // Declare shotgun JQuery adapter.
     $.fn.shotgunConsole = function (options) {
-        var $console = this,
+        var $console = this.css('display', 'block'),
             clientShell = new shotgun.ClientShell(options),
             cliText = '&gt;&nbsp;',
             $display = $('<div>').appendTo($console),
@@ -200,8 +200,7 @@
             queue = [],
             processingQueue = false,
             cliHistory = [],
-            cliIndex = -1,
-            saveContext;
+            cliIndex = -1;
 
         // Override default settings with the supplied options.
         var settings = $.extend({}, defaultSettings, options);

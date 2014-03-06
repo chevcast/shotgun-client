@@ -19,7 +19,7 @@
         for ( key in obj ) {}
 
         return key === undefined || hasOwn.call( obj, key );
-    };
+    }
     function extend() {
         var options, name, src, copy, copyIsArray, clone,
             target = arguments[0] || {},
@@ -42,7 +42,7 @@
 
         for ( ; i < length; i++ ) {
             // Only deal with non-null/undefined values
-            if ( (options = arguments[ i ]) != null ) {
+            if ( (options = arguments[ i ]) !== null ) {
                 // Extend the base object
                 for ( name in options ) {
                     src = target[ name ];
@@ -93,7 +93,7 @@
                 };
 
             // Override default settings with supplied options.
-            var settings = extend(true, {}, defaultSettings, options);
+            var settings = clientShell.settings = extend(true, {}, defaultSettings, options);
 
             // Instruct socket.io to connect to the server.
             var socket = clientShell.socket = io.connect('/' + settings.namespace);
@@ -128,7 +128,7 @@
                 .on('setCookie', function (name, value, days) {
                     var expiration = new Date();
                     expiration.setDate(expiration.getDate() + days);
-                    value = encodeURIComponent(value) + ((days == null) ? "" : ";expires=" + expiration.toUTCString());
+                    value = encodeURIComponent(value) + ((days === null) ? "" : ";expires=" + expiration.toUTCString());
                     document.cookie = settings.namespace + '-' + name + "=" + value;
                 })
                 .on('getCookie', function (name, callback) {
