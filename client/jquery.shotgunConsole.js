@@ -202,6 +202,8 @@
             cliHistory = [],
             cliIndex = -1;
 
+        ui.$display.data('processingQueue', processingQueue);
+
         // Override default settings with the supplied options.
         var settings = $.extend({}, defaultSettings, options);
 
@@ -246,6 +248,8 @@
             function nextLine() {
                 if (queue.length === 0) {
                     processingQueue = false;
+                    ui.$display.data('processingQueue', processingQueue);
+                    ui.$display.trigger('queueFinished');
                     return;
                 }
 
@@ -301,6 +305,7 @@
             }
 
             processingQueue = true;
+            ui.$display.data('processingQueue', processingQueue);
             nextLine();
         });
 
