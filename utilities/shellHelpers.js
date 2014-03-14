@@ -27,5 +27,12 @@ module.exports = exports = {
     multiLine: function () {
         this.emit('multiline');
         return this;
+    },
+
+    // Create a shell helper to listen for client-side events.
+    onClient: function () {
+        var socket = this.context.getVar('socket');
+        socket.on.apply(socket, arguments);
+        return this;
     }
 };

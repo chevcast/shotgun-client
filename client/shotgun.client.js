@@ -104,6 +104,12 @@
                 return clientShell;
             };
 
+            // Proxy any emit calls onto the socket itself.
+            clientShell.emit = function () {
+                socket.emit.apply(socket, arguments);
+                return clientShell;
+            };
+
             function getCookies() {
                 var cookies = {};
                 if (document.cookie.length > 0)
