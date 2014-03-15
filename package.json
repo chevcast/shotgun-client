@@ -22,9 +22,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "socket.io": "*",
-    "extend": "*",
-    "async": "~0.2.10"
+    "extend": "^1.2.1",
+    "socket.io": "^0.9.16",
+    "async": "^0.2.10"
   },
   "peerDependencies": {
     "shotgun": "*"
