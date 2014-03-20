@@ -1,4 +1,6 @@
 (function ($) {
+    if (typeof $ === 'undefined')
+        return;
 
     var defaults = {
         typeSpeed: 10,
