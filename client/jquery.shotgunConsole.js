@@ -260,7 +260,7 @@
                 // Browsers like to shrink multiple spaces down to a single space.
                 line.text = line.text.replace(/(  +)/g, function (match) {
                     return new Array(match.length + 1).join('&nbsp;');
-                }).replace(/(\r\n|\r|\n)/, '');
+                }).replace(/(\r\n|\r|\n)/, '').replace(/^ /, '&nbsp;');
 
                 // If text is empty then force a non-breaking space for compatibility with JQuery and coolType.
                 line.text = line.text.length > 0 ? line.text : '&nbsp;';
