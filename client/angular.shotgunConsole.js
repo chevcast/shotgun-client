@@ -1,7 +1,4 @@
-(function (angular) {
-    if (typeof angular === 'undefined')
-        return;
-
+if (typeof angular !== 'undefined') {
     // Place the directive inside a custom "shotgun" angular module/namespace.
     angular.module('shotgun', []).directive('shotgunConsole', function () {
         return {
@@ -30,4 +27,4 @@
             }
         };
     });
-})(angular);
+}
