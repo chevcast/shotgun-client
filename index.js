@@ -28,7 +28,7 @@ exports.attach = function (server) {
         else {
             var filePaths = [
                 // socket.io
-                '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js',
+                '/node_modules/socket.io/node_modules/socket.io-client/socket.io.js',
                 // shotgun client
                 '/client/shotgun.client.js',
                 // cooltype
