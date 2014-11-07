@@ -1,7 +1,7 @@
 module.exports = exports = {
-    parseOptions: function (key, options, cmd, shell) {
-        var definedOption = cmd.options[key];
-        if (definedOption.hasOwnProperty('prompt') && definedOption.multiLinePrompt && !options.hasOwnProperty(key))
-            shell.multiLine();
-    }
+  parseOptions: function (key, options, cmd, shell) {
+    var definedOption = cmd.options[key];
+    if (definedOption.hasOwnProperty('prompt') && definedOption.multiLinePrompt && !options.hasOwnProperty(key))
+      shell.multiLine();
+  }
 };
