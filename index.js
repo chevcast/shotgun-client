@@ -103,15 +103,15 @@ exports.attach = function (server) {
             case 'error':
               break;
             case 'contextChanged':
-              var contextData = arguments[0];
-            delete contextData.socket;
-            socket.emit('contextChanged', contextData);
-            break;
+              var contextData = extend({}, arguments[0]);
+              delete contextData.socket;
+              socket.emit('contextChanged', contextData);
+              break;
             default:
               var args = Array.prototype.splice.call(arguments, 0);
-            args.unshift(this.event);
-            socket.emit.apply(socket, args);
-            break;
+              args.unshift(this.event);
+              socket.emit.apply(socket, args);
+              break;
           }
         })
         // Instruct the shell to process the command string for this request.
